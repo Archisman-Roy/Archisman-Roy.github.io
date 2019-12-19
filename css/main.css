@@ -43,31 +43,28 @@ ul.posts li {
 }
 
 pre {
-    background-color: #D1D1D0;
-    overflow: auto;
-    font-family: 'Monaco', monospace;
-    padding: 0 1em;
-  }
-
+        font-family: "Courier 10 Pitch", Courier, monospace;
+        font-size: 95%;
+        line-height: 140%;
+        white-space: pre;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+    }       
 
 code {
-    font-family: Monaco, monospace;
-    font-size: $base-font-size;
-    line-height: 100%;
-    background-color: #eee;
-    padding: 0.2em;
-    letter-spacing: -0.05em;
-    word-break: normal;
-    /border-radius: 5px;/
-  }
-
-
-
-pre code {
-    border: none;
-    background: none;
-    font-size: $base-font-size * 0.875;
-    line-height: 1em;
-    letter-spacing: normal;
-    word-break: break-all;
-  }
+        font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+        font-size: 95%;
+        line-height: 140%;
+        white-space: pre;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+        background: #faf8f0;
+    }
+    
+#content code {
+        display: block;
+        padding: 0.5em 1em;
+        border: 1px solid #bebab0;
+    }
