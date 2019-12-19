@@ -38,7 +38,7 @@ ax.set(ylabel="")
 sns.despine(trim=True, left=True)
 ```
 
-![png](images/test_1_1.png)
+![png]({{ site.url }}/images/test_1_1.png)
 
 
 ### Just testing
