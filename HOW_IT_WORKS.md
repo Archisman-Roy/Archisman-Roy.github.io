@@ -1,9 +1,23 @@
 # How This Codebase Works
 
-This is a **Jekyll-powered static site** hosted on GitHub Pages at
-`https://archisman-roy.github.io`. Jekyll reads the source files in this repo,
-processes Liquid templates and Markdown, and outputs a complete static website
-into a `_site/` folder (which is `.gitignore`-d).
+This is a personal blog and tools site hosted on **GitHub Pages**. It uses
+**Jekyll**, a static site generator, to turn simple text files into a complete
+website. You write content in HTML or Markdown, push to GitHub, and the site
+updates automatically.
+
+---
+
+## What is Jekyll?
+
+Jekyll is a program (written in Ruby) that takes your source files -- HTML
+templates, Markdown posts, CSS -- and combines them into a finished website
+made entirely of plain HTML/CSS/JS files. There is no database, no server-side
+code, and no login. The output is a folder called `_site/` containing the
+final website that any browser can open.
+
+GitHub Pages runs Jekyll for you automatically every time you push to the
+`master` branch. You never need to run Jekyll yourself (though you can for
+local previewing -- see the bottom of this doc).
 
 ---
 
@@ -11,31 +25,157 @@ into a `_site/` folder (which is `.gitignore`-d).
 
 ```
 .
-├── _config.yml                          # Jekyll site-wide settings
-├── Gemfile                              # Ruby dependencies (github-pages gem)
-├── _layouts/
-│   ├── default.html                     # Base HTML shell (every page uses this)
-│   └── post.html                        # Blog-post wrapper (extends default)
-├── _posts/
-│   └── 2019-12-19-site-working.md       # A blog post (Markdown)
+├── _config.yml                              # Site-wide settings for Jekyll
+├── Gemfile                                  # Ruby dependencies for local dev
+├── .gitignore                               # Files Git should ignore
+│
+├── _layouts/                                # HTML wrappers (templates)
+│   ├── default.html                         #   Base shell used by every page
+│   └── post.html                            #   Blog post wrapper (extends default)
+│
+├── _posts/                                  # Blog posts (Markdown files)
+│   └── 2019-12-19-site-working.md           #   One blog post
+│
 ├── blog/
-│   └── index.html                       # Blog listing page
-├── css/
-│   └── main.css                         # Global stylesheet
-├── images/                              # Static image assets
+│   └── index.html                           # Blog listing page (shows all posts)
+│
 ├── tools/
+│   ├── index.html                           # Tools listing page (like blog index)
 │   └── sample-size-calculator/
-│       └── index.html                   # Interactive power-analysis tool
-├── index.html                           # Homepage
-├── .gitignore                           # Ignores _site/
+│       └── index.html                       # Interactive power analysis tool
+│
+├── css/
+│   └── main.css                             # Global stylesheet for the whole site
+│
+├── images/                                  # Static image assets
+├── index.html                               # Homepage
+├── HOW_IT_WORKS.md                          # This file (excluded from the site build)
 └── README.md
 ```
 
 ---
 
-## How Jekyll builds the site
+## The big picture: how a page gets built
 
-### 1. Configuration (`_config.yml`)
+When Jekyll builds your site, it follows this pipeline for every page:
+
+```
+ 1. Read the file (e.g. index.html)
+ 2. See the "front matter" block (the --- section at the top)
+ 3. Process any Liquid template tags (like {{ page.title }})
+ 4. If it's Markdown, convert it to HTML
+ 5. Wrap it in the layout specified in front matter
+ 6. If that layout has its own layout, wrap again (layout chaining)
+ 7. Write the final HTML to _site/
+```
+
+**Example**: a blog post goes through this chain:
+
+```
+ _posts/2019-12-19-site-working.md       (your Markdown content)
+         ↓  rendered into HTML
+ _layouts/post.html                      (adds title + date header)
+         ↓  wrapped inside
+ _layouts/default.html                   (adds nav, footer, CSS link)
+         ↓  written to
+ _site/blog/2019/12/19/site-working.html (final page visitors see)
+```
+
+---
+
+## Key concepts explained
+
+### Front matter
+
+The block of `---` lines at the top of a file. This is YAML metadata that
+tells Jekyll how to process the file. Every file that Jekyll should process
+needs front matter (even if it's empty).
+
+```yaml
+---
+layout: default
+title: My Page Title
+---
+```
+
+- **layout** -- which HTML wrapper to use (from `_layouts/`)
+- **title** -- the page title, accessible as `{{ page.title }}` in templates
+
+If a file has no front matter, Jekyll copies it to `_site/` as-is without
+processing.
+
+### Liquid template tags
+
+Jekyll uses a templating language called Liquid. You'll see two kinds of tags:
+
+- **Output tags** `{{ ... }}` -- print a value. Example: `{{ page.title }}`
+  prints the page's title.
+- **Logic tags** `{% raw %}{% ... %}{% endraw %}` -- control flow. Example: `{% raw %}{% for post in site.posts %}{% endraw %}`
+  loops through all blog posts.
+
+These only work inside files that have front matter.
+
+### Layouts (`_layouts/`)
+
+Layouts are HTML wrappers. Think of them like picture frames -- your content
+goes inside.
+
+**`default.html`** is the base frame for every page on the site:
+
+```
+┌─────────────────────────────────────┐
+│  <head> title, CSS link </head>     │
+│                                     │
+│  <nav> Home | Blog | Tools </nav>   │
+│                                     │
+│  ┌───────────────────────────────┐  │
+│  │                               │  │
+│  │   {{ content }}               │  │
+│  │   (your page goes here)      │  │
+│  │                               │  │
+│  └───────────────────────────────┘  │
+│                                     │
+│  <footer> email link </footer>      │
+└─────────────────────────────────────┘
+```
+
+This is why every page on the site has the same nav bar and footer -- they
+all use this layout. If you want to change the nav links (e.g., add a new
+section), you edit `_layouts/default.html`.
+
+**`post.html`** adds a title and date above blog post content, then wraps
+itself inside `default.html`. This is called **layout chaining** -- one
+layout can extend another.
+
+### Pages
+
+Any file with front matter becomes a page. The URL is determined by its
+location in the file tree:
+
+| File | URL | What it does |
+|------|-----|--------------|
+| `index.html` | `/` | Homepage with greeting |
+| `blog/index.html` | `/blog` | Lists all blog posts |
+| `tools/index.html` | `/tools` | Lists all tools |
+| `tools/sample-size-calculator/index.html` | `/tools/sample-size-calculator/` | The interactive calculator |
+
+### Blog posts (`_posts/`)
+
+Posts have a special naming convention: `YYYY-MM-DD-slug.md`
+
+- The date is parsed from the filename
+- The slug becomes part of the URL
+- The permalink pattern in `_config.yml` controls the final URL structure
+
+So `2019-12-19-site-working.md` becomes `/blog/2019/12/19/site-working`.
+
+Posts automatically show up in the blog listing page -- you don't need to
+manually add links. The blog listing page loops through all posts using
+Liquid.
+
+---
+
+## Configuration (`_config.yml`)
 
 ```yaml
 name: Archi's Blog
@@ -43,114 +183,42 @@ url: "https://archisman-roy.github.io"
 baseurl: ""
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
+exclude:
+  - HOW_IT_WORKS.md
+  - Gemfile
+  - Gemfile.lock
 ```
 
-- **name** / **url** / **baseurl** -- identify the site; used by Liquid tags
-  like `{{ site.url }}`.
-- **markdown: kramdown** -- the Markdown engine Jekyll uses to convert `.md`
-  files into HTML.
-- **permalink** -- controls the URL pattern for blog posts. A post dated
-  `2019-12-19` with slug `site-working` becomes
-  `/blog/2019/12/19/site-working`.
+| Setting | What it does |
+|---------|-------------|
+| `name` | Your site's name (available as `{{ site.name }}` in templates) |
+| `url` | The full URL where the site is hosted |
+| `baseurl` | Path prefix if the site lives in a subdirectory (empty for user sites) |
+| `markdown: kramdown` | The Markdown engine Jekyll uses |
+| `permalink` | URL pattern for blog posts (`:year`, `:month`, `:day`, `:title` are placeholders) |
+| `exclude` | Files that Jekyll should NOT process or copy to `_site/` |
 
-### 2. Gemfile
-
-```ruby
-source "https://rubygems.org"
-gem "github-pages", group: :jekyll_plugins
-```
-
-Tells GitHub Pages which Jekyll version and plugins to use when building the
-site. Without this file GitHub Pages may fail to build.
-
-### 3. Layouts (`_layouts/`)
-
-Layouts are HTML wrappers. A page specifies its layout in **front matter**
-(the `---` YAML block at the top of a file).
-
-#### `default.html` -- the base shell
-
-```
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="/css/main.css">
-  </head>
-  <body>
-    <nav>  Home | Blog | Tools  </nav>
-    <div class="container">
-      {{ content }}          <-- page body gets injected here
-    </div>
-    <footer> email link </footer>
-  </body>
-</html>
-```
-
-Every page on the site goes through this layout. The `{{ content }}` tag is
-where Jekyll injects the calling page's rendered body.
-
-#### `post.html` -- blog post layout
-
-```
----
-layout: default          <-- inherits from default.html
----
-<h1>{{ page.title }}</h1>
-<p class="meta">{{ page.date | date_to_string }}</p>
-<div class="post">
-  {{ content }}
-</div>
-```
-
-This layout **extends** `default.html` (note `layout: default` in its front
-matter). Jekyll first renders the post Markdown into HTML, injects it into
-`post.html` at `{{ content }}`, then injects that result into `default.html`
-at its own `{{ content }}`. This is layout chaining.
-
-### 4. Pages
-
-Any `.html` or `.md` file with front matter (`---` block) becomes a page.
-
-| File | URL | What it does |
-|------|-----|--------------|
-| `index.html` | `/` | Homepage -- shows a greeting and blurb |
-| `blog/index.html` | `/blog` | Lists all posts with `{% for post in site.posts %}` |
-| `tools/sample-size-calculator/index.html` | `/tools/sample-size-calculator/` | Interactive JS tool (see below) |
-
-### 5. Blog posts (`_posts/`)
-
-Files in `_posts/` follow the naming convention `YYYY-MM-DD-slug.md`. Jekyll
-parses the date and slug from the filename. Each post declares front matter:
-
-```yaml
----
-layout: post
-title: "Well, This is working"
-date: 2019-12-19
----
-```
-
-Jekyll converts the Markdown body to HTML, wraps it in `post.html`, which
-wraps it in `default.html`. The post shows up in the `site.posts` collection,
-which `blog/index.html` iterates over.
+The `exclude` list is important -- without it, Jekyll tries to process
+`HOW_IT_WORKS.md` and fails because it contains Liquid code examples that
+look like real template tags.
 
 ---
 
 ## How the stylesheet works (`css/main.css`)
 
-A single CSS file styles the entire site:
+One CSS file styles the entire site:
 
-- **Body**: centered at 70% width with 60px top/bottom margin.
-- **Nav & footer**: horizontal `<ul>` lists, Helvetica, bold, no bullets.
-- **Links**: gray (`#999`), underline on hover.
-- **Headings**: 3em Helvetica.
-- **Paragraphs**: 1.5em with `#333` color.
-- **Code blocks** (`pre`/`code`): monospace font, light gray background.
-- **Post list** (`ul.posts`): 1.5em, no bullets.
+- **Body**: centered at 70% width with 60px top/bottom margin
+- **Nav & footer**: horizontal lists, Helvetica, bold, no bullets
+- **Links**: gray (#999), underline on hover
+- **Headings**: 3em, Helvetica
+- **Paragraphs**: 1.5em, dark gray
+- **Code blocks**: monospace font, light gray background
+- **Post list** (`ul.posts`): also used by the tools listing page
 
-Individual pages (like the calculator) add page-scoped `<style>` blocks to
-override or extend these base styles without modifying `main.css`.
+Individual pages (like the calculator) add their own `<style>` blocks at the
+top of the file. These styles only affect that page and override the global
+CSS where needed, without touching `main.css`.
 
 ---
 
@@ -158,100 +226,183 @@ override or extend these base styles without modifying `main.css`.
 
 `tools/sample-size-calculator/index.html`
 
-This is a fully client-side interactive tool -- no server needed. It uses the
-`default` layout like any other page, then adds its own `<style>` block and
-JavaScript.
+This is a fully client-side interactive tool -- no server or backend needed.
+It uses the same `default` layout as every other page, then adds page-specific
+CSS and JavaScript inline.
 
-### Structure
+### Layout (side-by-side)
 
 ```
-┌─────────────────────────────────────────────┐
-│  <style> ... </style>   (page-scoped CSS)   │
-│                                             │
-│  <div class="calculator">                   │
-│    ├── Controls panel (4 sliders + inputs)  │
-│    ├── Results panel  (power + required n)  │
-│    └── Chart container (D3 SVG + legend)    │
-│  </div>                                     │
-│                                             │
-│  <script src="d3.v7.min.js">  (CDN)         │
-│  <script> ... </script>  (calculator logic) │
-└─────────────────────────────────────────────┘
+┌─────────────────────┬───────────────────────────────────┐
+│  Controls Panel     │                                   │
+│  ┌───────────────┐  │      D3.js Chart                  │
+│  │ n       [==■=]│  │                                   │
+│  │ σ       [==■=]│  │   ╭─H₀─╮        ╭─H₁─╮          │
+│  │ δ       [==■=]│  │  ╱      ╲  ←δ→  ╱      ╲         │
+│  │ α       [==■=]│  │ ╱   α    ╲____╱  power  ╲        │
+│  └───────────────┘  │                                   │
+│                     │      [legend]                     │
+│  ┌─Power──────────┐ │                                   │
+│  │    85.3%       │ ├───────────────────────────────────┤
+│  ├─Required n─────┤ │  Stacks vertically on mobile     │
+│  │    175         │ │                                   │
+│  └────────────────┘ │                                   │
+└─────────────────────┴───────────────────────────────────┘
 ```
 
-### Math (inside the `<script>`)
+Controls sit on the left so you can drag sliders and see the chart update
+in real time without scrolling.
 
-Three core math functions, all pure JavaScript with no dependencies:
+### The math (pure JavaScript, no dependencies)
+
+Three helper functions implement normal distribution math:
 
 | Function | What it computes |
 |----------|-----------------|
-| `pdf(x, mu, s)` | Normal probability density function |
-| `cdf(x)` | Standard normal CDF (Abramowitz & Stegun approximation) |
-| `qnorm(p)` | Inverse normal / quantile function (rational approximation) |
+| `pdf(x, mu, s)` | The height of the bell curve at point x |
+| `cdf(x)` | The area under the standard normal curve up to x |
+| `qnorm(p)` | The x-value where the area under the curve equals p |
 
-These feed two statistical calculations:
+These feed two calculations:
 
-**Power** (given n, sigma, MDE, alpha):
+**Statistical power** (probability of detecting a real effect):
 ```
-SE    = sigma * sqrt(2/n)           # standard error of mean difference
-z_c   = qnorm(1 - alpha/2)         # critical z-value
-power = 1 - cdf(z_c - MDE/SE)      # right-tail detection
-      + cdf(-z_c - MDE/SE)         # left-tail detection (usually tiny)
+SE    = σ × sqrt(2/n)             ← how much noise is in your measurement
+z_c   = qnorm(1 - α/2)           ← the critical threshold for significance
+power = 1 - cdf(z_c - δ/SE)      ← chance the alternative clears the threshold
+      + cdf(-z_c - δ/SE)         ← (left tail, usually negligible)
 ```
 
 **Required sample size** (for 80% power):
 ```
-n = ceil( 2 * sigma^2 * (z_{alpha/2} + z_{0.8})^2 / MDE^2 )
+n = ceil( 2 × σ² × (z_α/2 + z_0.8)² / δ² )
 ```
 
-### Visualization (D3.js)
+### The visualization (D3.js)
 
-The chart is an SVG rendered by D3 v7 (loaded from CDN). On every slider
-change the `render()` function:
+D3 v7 is loaded from a CDN (`d3js.org`). The chart is an SVG element that
+scales responsively using `viewBox`.
 
-1. Recomputes `SE` and the critical value `cv = z_c * SE`.
-2. Generates 300 data points each for the null `N(0, SE^2)` and alternative
-   `N(MDE, SE^2)` distributions.
-3. Sets x/y scales to fit both curves with some padding.
-4. Updates six SVG `<path>` elements (layered back-to-front):
-   - **Rejection areas** (light red) -- area under null curve beyond +/-cv.
-   - **Power areas** (light green) -- area under alternative curve beyond +/-cv.
-   - **Null curve** (blue line) -- the full null distribution.
-   - **Alternative curve** (red line) -- the full alternative distribution.
-5. Updates dashed critical-value lines and axis labels.
+Every time a slider changes, the `render()` function:
 
-The SVG uses `viewBox` for responsive scaling -- it automatically fits any
-container width.
+1. Recomputes SE and the critical value
+2. Generates 300 data points each for the null and alternative distributions
+3. Updates SVG path elements (layered back-to-front):
+   - **Rejection areas** (light red) -- where we'd reject the null hypothesis
+   - **Power areas** (light green) -- where the alternative distribution falls
+     in the rejection region
+   - **Null curve** (blue) -- distribution assuming no effect
+   - **Alternative curve** (red) -- distribution assuming the true effect = δ
+4. Updates critical value lines, labels, and the MDE annotation (δ bracket)
+5. Rescales axes to fit the current distributions
 
-### Wiring (slider <-> state <-> chart)
+### How the interactivity works
 
-A shared state object `S = { n, sigma, mde, alpha }` is the single source of
-truth. Each slider and number input listens for `input` events, updates `S`,
-syncs its counterpart (slider <-> input), and calls `render()`. This creates
-the real-time interactive feel.
+```
+   Slider dragged
+        │
+        ▼
+   Update state object S = { n, sigma, mde, alpha }
+        │
+        ├──▶ Sync the number input to match slider value
+        │
+        └──▶ Call render()
+                │
+                ├──▶ Recompute power & required n → update display cards
+                │
+                └──▶ Recompute & redraw all SVG elements
+```
+
+Each slider and number input are wired bidirectionally -- changing either
+one updates the shared state and triggers a full re-render.
 
 ---
 
 ## How GitHub Pages deploys the site
 
-1. You push to the `master` branch.
-2. GitHub Pages detects the `Gemfile` and runs Jekyll to build `_site/`.
-3. The contents of `_site/` are served at `https://archisman-roy.github.io`.
+```
+ You run: git push origin master
+           │
+           ▼
+ GitHub detects the push
+           │
+           ▼
+ GitHub Pages runs Jekyll (its own version, not yours)
+           │
+           ▼
+ Jekyll builds _site/ from your source files
+           │
+           ▼
+ _site/ is served at https://archisman-roy.github.io
+```
 
-The `_site/` directory is in `.gitignore` because GitHub rebuilds it on every
-push -- you never need to commit build output.
+GitHub Pages uses its own Ruby environment and Jekyll version (currently 3.10).
+Your Gemfile is for local development only.
+
+---
+
+## Files Git ignores (`.gitignore`)
+
+```
+_site/          # Jekyll's build output -- GitHub rebuilds this on every push
+Gemfile.lock    # Exact gem versions -- not needed since GitHub uses its own
+```
+
+You never commit build output or lock files for this project.
+
+---
+
+## Local development
+
+To preview the site on your computer before pushing:
+
+```bash
+# First time: make sure Homebrew Ruby is in your PATH
+export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:$PATH"
+
+# First time: install dependencies
+bundle install
+
+# Start the local server
+bundle exec jekyll serve
+```
+
+Then open `http://localhost:4000`. The server watches for file changes and
+auto-rebuilds (except `_config.yml` changes, which need a restart).
+
+**Note**: the Gemfile uses Jekyll 4 for local development because the
+`github-pages` gem (which pins Jekyll 3.9) isn't compatible with modern
+Ruby (4.x). This is fine -- your site is simple and builds identically
+on both versions.
 
 ---
 
 ## How to add new content
 
-**New blog post**: create `_posts/YYYY-MM-DD-your-slug.md` with front matter
-`layout: post`, `title`, and `date`. It automatically appears on `/blog`.
+### New blog post
 
-**New standalone page**: create `folder/index.html` (or `page.html`) with
-front matter `layout: default` and a `title`. Add a nav link in
-`_layouts/default.html` if you want it in the menu.
+1. Create a file in `_posts/` named `YYYY-MM-DD-your-title.md`
+2. Add front matter at the top:
+   ```yaml
+   ---
+   layout: post
+   title: "Your Post Title"
+   date: YYYY-MM-DD
+   ---
+   ```
+3. Write your content in Markdown below the front matter
+4. Push to GitHub -- it automatically appears on the `/blog` page
 
-**New interactive tool**: same as a standalone page, but add `<style>` and
-`<script>` blocks for CSS/JS. Load libraries from CDN. Everything runs
-client-side.
+### New standalone page
+
+1. Create `your-page/index.html` (or `your-page.html`)
+2. Add front matter with `layout: default` and a `title`
+3. Optionally add a nav link in `_layouts/default.html`
+
+### New interactive tool
+
+1. Create `tools/your-tool/index.html` with `layout: default`
+2. Add `<style>` for page-specific CSS and `<script>` for JavaScript
+3. Load any libraries from CDN (e.g., D3.js, Chart.js)
+4. Add a list entry in `tools/index.html` so it shows up on the tools page
+5. Everything runs client-side in the browser -- no backend needed
