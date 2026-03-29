@@ -1,3 +1,5 @@
-name: Hank Quinlan, Horrible Cop
+name: Archi's Blog
+url: "https://archisman-roy.github.io"
+baseurl: ""
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
