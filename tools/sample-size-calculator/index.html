@@ -4,6 +4,9 @@ title: Sample Size Calculator
 ---
 
 <style>
+.calculator {
+    margin-bottom: 15px;
+}
 .calculator p {
     font-size: 1em;
     color: #555;
@@ -26,24 +29,55 @@ title: Sample Size Calculator
     flex: 1;
     min-width: 0;
 }
-.controls-panel {
-    background: #f8f9fa;
+.mode-toggle {
+    display: flex;
+    margin-bottom: 16px;
     border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #5dbcd2;
+}
+.mode-btn {
+    flex: 1;
+    padding: 9px 0;
+    border: none;
+    background: #fff;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.82em;
+    font-weight: 700;
+    color: #5dbcd2;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.mode-btn:not(:last-child) {
+    border-right: 2px solid #5dbcd2;
+}
+.mode-btn.active {
+    background: #5dbcd2;
+    color: #fff;
+}
+.mode-btn:hover:not(.active) {
+    background: #f0fafb;
+}
+.controls-panel {
+    background: #f7f9fb;
+    border-radius: 10px;
     padding: 20px;
     margin-bottom: 16px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #e4e9ed;
 }
 .control-group {
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 .control-group:last-child { margin-bottom: 0; }
+.control-group.hidden { display: none; }
 .control-label {
     display: block;
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 0.82em;
+    font-size: 0.8em;
     font-weight: 600;
-    color: #444;
-    margin-bottom: 5px;
+    color: #555;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
 }
 .control-input-row {
     display: flex;
@@ -54,38 +88,50 @@ title: Sample Size Calculator
     flex: 1;
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
-    background: #ddd;
-    border-radius: 3px;
+    height: 8px;
+    background: #e4e9ed;
+    border-radius: 20px;
     outline: none;
 }
 .control-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
-    background: #4a90d9;
+    width: 20px;
+    height: 20px;
+    background: #2c3e50;
     border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.15s;
+}
+.control-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
 }
 .control-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    background: #4a90d9;
+    width: 20px;
+    height: 20px;
+    background: #2c3e50;
     border-radius: 50%;
     cursor: pointer;
     border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 .control-num {
     width: 68px;
     text-align: right;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 4px 8px;
+    border: 1px solid #d5dbe0;
+    border-radius: 6px;
+    padding: 5px 8px;
     font-family: 'Monaco', 'Consolas', monospace;
     font-size: 0.85em;
     font-weight: 600;
-    color: #4a90d9;
+    color: #2c3e50;
+    background: #fff;
+}
+.control-num:focus {
+    outline: none;
+    border-color: #5dbcd2;
+    box-shadow: 0 0 0 2px rgba(93,188,210,0.2);
 }
 .results-panel {
     display: flex;
@@ -94,93 +140,101 @@ title: Sample Size Calculator
 }
 .result-card {
     background: #fff;
-    border-radius: 8px;
-    padding: 14px 16px;
+    border-radius: 10px;
+    padding: 20px 16px 24px;
     text-align: center;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #e4e9ed;
 }
-.result-card.power { border-color: #4a90d9; }
-.result-card.sample-size { border-color: #2ecc71; }
+.result-card.power { border-color: #47b784; }
+.result-card.sample-size { border-color: #5dbcd2; }
 .result-label {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 0.72em;
-    color: #888;
+    font-size: 0.7em;
+    color: #8a959e;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
 }
 .result-value {
-    font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 1.8em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2em;
     font-weight: 700;
 }
-.result-card.power .result-value { color: #4a90d9; }
-.result-card.sample-size .result-value { color: #2ecc71; }
+.result-card.power .result-value { color: #47b784; }
+.result-card.sample-size .result-value { color: #5dbcd2; }
 .result-detail {
     font-size: 0.7em;
-    color: #aaa;
-    margin-top: 2px;
+    color: #aab4bc;
+    margin-top: 8px;
     font-family: 'Helvetica', 'Arial', sans-serif;
 }
 .chart-container {
     background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e4e9ed;
+    padding: 20px 16px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 .chart-container svg { width: 100%; height: auto; }
 .legend-bar {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 8px;
+    gap: 18px;
+    margin-top: 10px;
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 0.75em;
-    color: #555;
+    color: #6b7b8a;
 }
-.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-swatch {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 4px;
     border-radius: 2px;
     flex-shrink: 0;
+}
+.legend-swatch.dashed {
+    background: repeating-linear-gradient(
+        90deg, #465c6e 0px, #465c6e 4px, transparent 4px, transparent 7px
+    );
 }
 .axis text {
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 11px;
-    fill: #888;
+    fill: #8a959e;
 }
-.axis line, .axis path { stroke: #ddd; }
+.axis path { stroke: none; }
+.axis line { stroke: #dde2e6; }
 .axis-label {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 12px;
-    fill: #888;
+    font-size: 11px;
+    fill: #8a959e;
+    letter-spacing: 0.3px;
 }
 .crit-line {
-    stroke: #e74c3c;
+    stroke: #465c6e;
     stroke-width: 1.5;
-    stroke-dasharray: 6, 4;
-    opacity: 0.6;
+    stroke-dasharray: 5, 4;
+    opacity: 0.5;
 }
 .annot {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 11px;
-    fill: #999;
+    font-size: 10px;
+    fill: #8a959e;
 }
 .mde-line {
-    stroke: #888;
+    stroke: #8a959e;
     stroke-width: 1;
 }
 .mde-tick {
-    stroke: #888;
+    stroke: #8a959e;
     stroke-width: 1;
 }
 .mde-label {
-    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-family: Georgia, 'Times New Roman', serif;
     font-size: 11px;
-    fill: #666;
-    font-weight: 600;
+    fill: #6b7b8a;
+    font-style: italic;
 }
 @media (max-width: 1024px) {
     .calc-layout {
@@ -203,6 +257,11 @@ title: Sample Size Calculator
 
     <div class="calc-layout">
         <div class="calc-left">
+            <div class="mode-toggle">
+                <button class="mode-btn active" data-mode="continuous">Continuous</button>
+                <button class="mode-btn" data-mode="proportions">Proportions</button>
+            </div>
+
             <div class="controls-panel">
                 <div class="control-group">
                     <label class="control-label">Sample Size per Group (n)</label>
@@ -213,7 +272,16 @@ title: Sample Size Calculator
                                value="200" min="2" max="100000" step="10">
                     </div>
                 </div>
-                <div class="control-group">
+                <div class="control-group" id="group-mu0">
+                    <label class="control-label">Null Mean (&mu;&#8320;)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-mu0"
+                               min="1" max="500" value="100" step="1">
+                        <input type="number" class="control-num" id="input-mu0"
+                               value="100" min="1" max="10000" step="1">
+                    </div>
+                </div>
+                <div class="control-group" id="group-sigma">
                     <label class="control-label">Standard Deviation (&sigma;)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-sigma"
@@ -222,13 +290,22 @@ title: Sample Size Calculator
                                value="10" min="0.1" max="500" step="0.5">
                     </div>
                 </div>
+                <div class="control-group hidden" id="group-baseline">
+                    <label class="control-label">Baseline Rate (%)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-baseline"
+                               min="1" max="50" value="10" step="0.5">
+                        <input type="number" class="control-num" id="input-baseline"
+                               value="10" min="0.1" max="99" step="0.5">
+                    </div>
+                </div>
                 <div class="control-group">
-                    <label class="control-label">Min Detectable Effect (&delta;)</label>
+                    <label class="control-label" id="label-mde">Relative MDE (%)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-mde"
-                               min="0.5" max="20" value="3" step="0.5">
+                               min="1" max="100" value="3" step="1">
                         <input type="number" class="control-num" id="input-mde"
-                               value="3" min="0.01" max="200" step="0.5">
+                               value="3" min="0.1" max="500" step="1">
                     </div>
                 </div>
                 <div class="control-group">
@@ -261,19 +338,19 @@ title: Sample Size Calculator
                 <div id="dist-chart"></div>
                 <div class="legend-bar">
                     <div class="legend-item">
-                        <div class="legend-swatch" style="background:#4a90d9;"></div>
+                        <div class="legend-swatch dashed"></div>
                         <span>Null (H&#8320;)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-swatch" style="background:#e74c3c;"></div>
+                        <div class="legend-swatch" style="background:#5dbcd2;"></div>
                         <span>Alternative (H&#8321;)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-swatch" style="background:rgba(46,204,113,0.35);border:1px solid rgba(46,204,113,0.6);"></div>
+                        <div class="legend-swatch" style="background:rgba(71,183,132,0.4);border:1px solid rgba(71,183,132,0.6);height:10px;"></div>
                         <span>Power (1&minus;&beta;)</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-swatch" style="background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);"></div>
+                        <div class="legend-swatch" style="background:rgba(224,93,93,0.25);border:1px solid rgba(224,93,93,0.5);height:10px;"></div>
                         <span>Rejection (&alpha;)</span>
                     </div>
                 </div>
@@ -308,11 +385,17 @@ title: Sample Size Calculator
     }
 
     /* ---- state ---- */
-    var S = { n:200, sigma:10, mde:3, alpha:0.05 };
+    var S = { n:200, sigma:10, mde:3, alpha:0.05, mode:'continuous', baseline:10, mu0:100 };
+
+    /* ---- DOM refs ---- */
+    var groupSigma    = document.getElementById('group-sigma');
+    var groupBaseline = document.getElementById('group-baseline');
+    var groupMu0      = document.getElementById('group-mu0');
+    var labelMde      = document.getElementById('label-mde');
 
     /* ---- chart scaffold ---- */
-    var margin = {top:28, right:25, bottom:48, left:52};
-    var W = 700, H = 370;
+    var margin = {top:30, right:25, bottom:48, left:60};
+    var W = 700, H = 350;
     var w = W-margin.left-margin.right, h = H-margin.top-margin.bottom;
 
     var svg = d3.select('#dist-chart').append('svg')
@@ -322,18 +405,19 @@ title: Sample Size Calculator
         .attr('transform','translate('+margin.left+','+margin.top+')');
 
     /* layers (back to front) */
+    var lAltFill  = svg.append('path');  /* alternative distribution fill */
     var lRejectL  = svg.append('path');
     var lRejectR  = svg.append('path');
     var lPowerR   = svg.append('path');
     var lPowerL   = svg.append('path');
-    var lNull     = svg.append('path');
-    var lAlt      = svg.append('path');
+    var lNull     = svg.append('path');  /* null: dashed line only */
+    var lAlt      = svg.append('path');  /* alternative: solid line */
     var lCritL    = svg.append('line').attr('class','crit-line');
     var lCritR    = svg.append('line').attr('class','crit-line');
     var tCritL    = svg.append('text').attr('class','annot').attr('text-anchor','middle');
     var tCritR    = svg.append('text').attr('class','annot').attr('text-anchor','middle');
-    var tH0       = svg.append('text').attr('class','annot').style('font-weight','700').attr('fill','#4a90d9');
-    var tH1       = svg.append('text').attr('class','annot').style('font-weight','700').attr('fill','#e74c3c');
+    var tH0       = svg.append('text').attr('class','annot').style('font-weight','700').attr('fill','#465c6e');
+    var tH1       = svg.append('text').attr('class','annot').style('font-weight','700').attr('fill','#4aaab8');
 
     /* MDE annotation elements */
     var mdeLine   = svg.append('line').attr('class','mde-line');
@@ -343,33 +427,60 @@ title: Sample Size Calculator
 
     var gX        = svg.append('g').attr('class','axis').attr('transform','translate(0,'+h+')');
     var gY        = svg.append('g').attr('class','axis');
-    svg.append('text').attr('class','axis-label').attr('text-anchor','middle')
+    var xAxisLabel = svg.append('text').attr('class','axis-label').attr('text-anchor','middle')
        .attr('x',w/2).attr('y',h+40).text('Observed Difference in Means');
     svg.append('text').attr('class','axis-label').attr('text-anchor','middle')
-       .attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).text('Density');
+       .attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-45).text('Density');
 
     /* ---- update ---- */
     function render() {
-        var n=S.n, sigma=S.sigma, mde=S.mde, alpha=S.alpha;
-        var se = sigma*Math.sqrt(2/n);
-        var zc = qnorm(1-alpha/2);
-        var cv = zc*se;
+        var isProp = S.mode === 'proportions';
+        var n = S.n, alpha = S.alpha;
+
+        /* internal values for power calculation */
+        var sigmaInt, mdeInt;
+        if (isProp) {
+            var p = Math.max(S.baseline, 0.1) / 100;
+            sigmaInt = Math.sqrt(p * (1 - p));
+            mdeInt   = (S.mde / 100) * p;  /* relative % of baseline rate */
+        } else {
+            var mu0Safe = Math.max(Math.abs(S.mu0), 0.01);
+            sigmaInt = S.sigma;
+            mdeInt   = (S.mde / 100) * mu0Safe;  /* relative % of mu0 */
+        }
 
         /* power */
-        var pow = 1 - cdf(zc - mde/se) + cdf(-zc - mde/se);
+        var seInt = sigmaInt * Math.sqrt(2/n);
+        var zc = qnorm(1 - alpha/2);
+        var pow = 1 - cdf(zc - mdeInt/seInt) + cdf(-zc - mdeInt/seInt);
         pow = Math.max(0, Math.min(1, pow));
-        var reqN = Math.ceil(2*sigma*sigma*Math.pow(qnorm(1-alpha/2)+qnorm(0.8),2)/(mde*mde));
+        var reqN = Math.ceil(2*sigmaInt*sigmaInt*Math.pow(qnorm(1-alpha/2)+qnorm(0.8),2)/(mdeInt*mdeInt));
 
         document.getElementById('power-display').textContent = (pow*100).toFixed(1)+'%';
         document.getElementById('power-display').style.color =
-            pow>=0.8 ? '#2ecc71' : pow>=0.5 ? '#f39c12' : '#e74c3c';
+            pow>=0.8 ? '#47b784' : pow>=0.5 ? '#e8a838' : '#e05d5d';
         document.getElementById('required-n-display').textContent = reqN.toLocaleString();
 
+        /* display values */
+        var mu0d, mded, sed;
+        if (isProp) {
+            mu0d = S.baseline;
+            mded = mdeInt * 100;  /* absolute delta in pp for display */
+            sed  = seInt * 100;
+        } else {
+            mu0d = S.mu0;
+            mded = mdeInt;  /* absolute delta for display */
+            sed  = seInt;
+        }
+
+        var cvd = zc * sed;
+        var altMean = mu0d + mded;
+
         /* scales */
-        var xLo = Math.min(-4*se, mde-4*se) - se*0.3;
-        var xHi = Math.max( 4*se, mde+4*se) + se*0.3;
+        var xLo = Math.min(mu0d - 4*sed, altMean - 4*sed) - sed*0.3;
+        var xHi = Math.max(mu0d + 4*sed, altMean + 4*sed) + sed*0.3;
         var xS  = d3.scaleLinear().domain([xLo,xHi]).range([0,w]);
-        var yPk = Math.max(pdf(0,0,se), pdf(mde,mde,se))*1.15;
+        var yPk = Math.max(pdf(mu0d,mu0d,sed), pdf(altMean,altMean,sed))*1.15;
         var yS  = d3.scaleLinear().domain([0,yPk]).range([h,0]);
 
         /* data */
@@ -377,58 +488,78 @@ title: Sample Size Calculator
         var dNull=[], dAlt=[];
         for(var i=0;i<=N;i++){
             var x=xLo+i*step;
-            dNull.push([x, pdf(x,0,se)]);
-            dAlt.push([x, pdf(x,mde,se)]);
+            dNull.push([x, pdf(x,mu0d,sed)]);
+            dAlt.push([x, pdf(x,altMean,sed)]);
         }
 
         var line = d3.line().x(function(d){return xS(d[0])}).y(function(d){return yS(d[1])});
         var area = d3.area().x(function(d){return xS(d[0])}).y0(h).y1(function(d){return yS(d[1])});
 
-        /* curves */
-        lNull.attr('d',line(dNull)).attr('fill','none').attr('stroke','#4a90d9').attr('stroke-width',2.5);
-        lAlt .attr('d',line(dAlt)) .attr('fill','none').attr('stroke','#e74c3c').attr('stroke-width',2.5);
+        /* alternative fill (whole distribution, light) */
+        lAltFill.attr('d',area(dAlt)).attr('fill','rgba(93,188,210,0.15)').attr('stroke','none');
+
+        /* null: dashed line, no fill */
+        lNull.attr('d',line(dNull)).attr('fill','none')
+             .attr('stroke','#465c6e').attr('stroke-width',2).attr('stroke-dasharray','5,3');
+
+        /* alternative: solid line */
+        lAlt.attr('d',line(dAlt)).attr('fill','none')
+            .attr('stroke','#5dbcd2').attr('stroke-width',2.5);
 
         /* shaded areas */
-        lRejectL.attr('d',area(dNull.filter(function(d){return d[0]<=-cv}))).attr('fill','rgba(231,76,60,0.15)');
-        lRejectR.attr('d',area(dNull.filter(function(d){return d[0]>= cv}))).attr('fill','rgba(231,76,60,0.15)');
-        lPowerR .attr('d',area(dAlt .filter(function(d){return d[0]>= cv}))).attr('fill','rgba(46,204,113,0.3)');
-        lPowerL .attr('d',area(dAlt .filter(function(d){return d[0]<=-cv}))).attr('fill','rgba(46,204,113,0.3)');
+        var critLo = mu0d - cvd, critHi = mu0d + cvd;
+        lRejectL.attr('d',area(dNull.filter(function(d){return d[0]<=critLo}))).attr('fill','rgba(224,93,93,0.2)');
+        lRejectR.attr('d',area(dNull.filter(function(d){return d[0]>=critHi}))).attr('fill','rgba(224,93,93,0.2)');
+        lPowerR .attr('d',area(dAlt .filter(function(d){return d[0]>=critHi}))).attr('fill','rgba(71,183,132,0.3)');
+        lPowerL .attr('d',area(dAlt .filter(function(d){return d[0]<=critLo}))).attr('fill','rgba(71,183,132,0.3)');
 
         /* critical lines */
-        lCritL.attr('x1',xS(-cv)).attr('x2',xS(-cv)).attr('y1',0).attr('y2',h);
-        lCritR.attr('x1',xS( cv)).attr('x2',xS( cv)).attr('y1',0).attr('y2',h);
-        tCritL.attr('x',xS(-cv)).attr('y',-6).text('-'+cv.toFixed(1));
-        tCritR.attr('x',xS( cv)).attr('y',-6).text( cv.toFixed(1));
+        lCritL.attr('x1',xS(critLo)).attr('x2',xS(critLo)).attr('y1',0).attr('y2',h);
+        lCritR.attr('x1',xS(critHi)).attr('x2',xS(critHi)).attr('y1',0).attr('y2',h);
+
+        /* critical value labels */
+        var fmt = isProp ? function(v){return v.toFixed(1)+'%'} : function(v){return v.toFixed(1)};
+        tCritL.attr('x',xS(critLo)).attr('y',-8).text(fmt(critLo));
+        tCritR.attr('x',xS(critHi)).attr('y',-8).text(fmt(critHi));
 
         /* dist labels */
-        tH0.attr('x',xS(0))  .attr('y',yS(pdf(0,0,se))-12)  .attr('text-anchor','middle').text('H\u2080');
-        tH1.attr('x',xS(mde)).attr('y',yS(pdf(mde,mde,se))-12).attr('text-anchor','middle').text('H\u2081');
+        tH0.attr('x',xS(mu0d))   .attr('y',yS(pdf(mu0d,mu0d,sed))-14)     .attr('text-anchor','middle')
+           .text('H\u2080: \u03BC='+fmt(mu0d));
+        tH1.attr('x',xS(altMean)).attr('y',yS(pdf(altMean,altMean,sed))-14).attr('text-anchor','middle')
+           .text('H\u2081: \u03BC='+fmt(altMean));
 
-        /* MDE annotation - dimension line between the two peaks */
-        var mdeY = h - 22;
+        /* MDE annotation */
+        var mdeY = h - 24;
         var tickH = 8;
         mdeLine
-            .attr('x1',xS(0)).attr('x2',xS(mde))
+            .attr('x1',xS(mu0d)).attr('x2',xS(altMean))
             .attr('y1',mdeY).attr('y2',mdeY);
         mdeTickL
-            .attr('x1',xS(0)).attr('x2',xS(0))
+            .attr('x1',xS(mu0d)).attr('x2',xS(mu0d))
             .attr('y1',mdeY-tickH/2).attr('y2',mdeY+tickH/2);
         mdeTickR
-            .attr('x1',xS(mde)).attr('x2',xS(mde))
+            .attr('x1',xS(altMean)).attr('x2',xS(altMean))
             .attr('y1',mdeY-tickH/2).attr('y2',mdeY+tickH/2);
-        mdeLabel
-            .attr('x',xS(mde/2)).attr('y',mdeY-7)
-            .text('\u03B4 = '+mde.toFixed(1));
+        mdeLabel.attr('x',xS((mu0d+altMean)/2)).attr('y',mdeY-8)
+            .text('\u03B4 = '+(isProp ? mded.toFixed(1)+'pp' : mded.toFixed(1)));
+
+        /* x-axis label */
+        if (isProp) {
+            xAxisLabel.text('Conversion Rate (%)');
+        } else {
+            xAxisLabel.text('Observed Mean');
+        }
 
         /* axes */
         gX.call(d3.axisBottom(xS).ticks(8));
-        gY.call(d3.axisLeft(yS).ticks(6));
+        gY.call(d3.axisLeft(yS).ticks(5));
     }
 
-    /* ---- wiring ---- */
-    ['n','sigma','mde','alpha'].forEach(function(key){
+    /* ---- slider wiring ---- */
+    function wireSlider(key) {
         var slider = document.getElementById('slider-'+key);
         var input  = document.getElementById('input-'+key);
+        if (!slider || !input) return;
         slider.addEventListener('input', function(){
             S[key] = parseFloat(this.value);
             input.value = this.value;
@@ -436,12 +567,59 @@ title: Sample Size Calculator
         });
         input.addEventListener('input', function(){
             var v = parseFloat(this.value);
-            if(!isNaN(v) && v>0){
+            if(!isNaN(v)){
                 S[key] = v;
                 slider.value = Math.min(Math.max(v,parseFloat(slider.min)),parseFloat(slider.max));
                 render();
             }
         });
+    }
+    ['n','sigma','mde','alpha','baseline','mu0'].forEach(wireSlider);
+
+    /* ---- mode toggle ---- */
+    function setSlider(key, val) {
+        var slider = document.getElementById('slider-'+key);
+        var input  = document.getElementById('input-'+key);
+        S[key] = val;
+        if (slider) slider.value = Math.min(Math.max(val, parseFloat(slider.min)), parseFloat(slider.max));
+        if (input) input.value = val;
+    }
+
+    function configureSlider(key, min, max, step, val) {
+        var slider = document.getElementById('slider-'+key);
+        slider.min = min; slider.max = max; slider.step = step;
+        setSlider(key, val);
+    }
+
+    function switchMode(mode) {
+        S.mode = mode;
+        document.querySelectorAll('.mode-btn').forEach(function(btn){
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+
+        if (mode === 'proportions') {
+            groupSigma.classList.add('hidden');
+            groupMu0.classList.add('hidden');
+            groupBaseline.classList.remove('hidden');
+            labelMde.innerHTML = 'Relative MDE (%)';
+            configureSlider('mde', 1, 100, 1, 20);
+            configureSlider('n', 100, 50000, 100, 3500);
+            setSlider('baseline', 10);
+        } else {
+            groupSigma.classList.remove('hidden');
+            groupMu0.classList.remove('hidden');
+            groupBaseline.classList.add('hidden');
+            labelMde.innerHTML = 'Relative MDE (%)';
+            configureSlider('mde', 1, 100, 1, 3);
+            configureSlider('n', 10, 5000, 10, 200);
+            setSlider('sigma', 10);
+            setSlider('mu0', 100);
+        }
+        render();
+    }
+
+    document.querySelectorAll('.mode-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){ switchMode(this.dataset.mode); });
     });
 
     render();
