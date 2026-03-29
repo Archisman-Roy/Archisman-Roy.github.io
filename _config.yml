@@ -3,3 +3,7 @@ url: "https://archisman-roy.github.io"
 baseurl: ""
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
+exclude:
+  - HOW_IT_WORKS.md
+  - Gemfile
+  - Gemfile.lock
