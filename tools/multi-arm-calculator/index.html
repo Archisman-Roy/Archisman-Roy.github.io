@@ -236,6 +236,13 @@ title: Multi-Arm Experiment Calculator
 .btn-max-power:hover {
     background: #f0faf5;
 }
+.alloc-note {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.72em;
+    color: #8a959e;
+    line-height: 1.6;
+    margin-top: 12px;
+}
 
 /* Below-chart area */
 .below-chart {
@@ -546,6 +553,12 @@ title: Multi-Arm Experiment Calculator
                     <div class="result-detail">Using current traffic allocation, two-tailed</div>
                 </div>
                 </div>
+            </div>
+            <div class="alloc-note">
+                <strong>Even Split</strong> divides traffic equally across all groups (control + treatments).
+                <strong>Max Power</strong> allocates traffic to maximize power for control vs. any treatment.
+                Control receives more traffic since it is shared across all comparisons.
+                Optimal control share = 1 / (1 + &radic;n), where n is the number of treatments.
             </div>
         </div>
     </div>
