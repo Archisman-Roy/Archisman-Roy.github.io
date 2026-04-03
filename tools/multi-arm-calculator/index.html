@@ -230,17 +230,41 @@ title: Multi-Arm Experiment Calculator
     background: #f0fafb;
 }
 
-/* Comparison selects */
+/* Below-chart area */
+.below-chart {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    align-items: stretch;
+}
+.compare-panel {
+    flex: 0 0 auto;
+    background: #f7f9fb;
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid #e4e9ed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 .compare-row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
+.compare-label {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: #8a959e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
 .compare-select {
-    flex: 1;
     border: 1px solid #d5dbe0;
     border-radius: 6px;
-    padding: 7px 10px;
+    padding: 6px 8px;
     font-family: 'Helvetica', 'Arial', sans-serif;
     font-size: 0.82em;
     font-weight: 500;
@@ -260,18 +284,18 @@ title: Multi-Arm Experiment Calculator
 }
 .compare-info {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    font-size: 0.75em;
+    font-size: 0.72em;
     color: #6b7b8a;
-    margin-top: 10px;
-    line-height: 1.5;
+    margin-top: 6px;
+    line-height: 1.4;
 }
 
 /* Results */
 .results-panel {
+    flex: 1;
     display: flex;
     flex-direction: row;
     gap: 12px;
-    margin-top: 16px;
 }
 .result-card {
     flex: 1;
@@ -377,6 +401,9 @@ title: Multi-Arm Experiment Calculator
         flex: none;
         width: 100%;
     }
+    .below-chart {
+        flex-direction: column;
+    }
     .results-panel {
         flex-direction: column;
     }
@@ -463,17 +490,6 @@ title: Multi-Arm Experiment Calculator
                 </div>
             </div>
 
-            <!-- Comparison -->
-            <div class="controls-panel">
-                <div class="panel-title">Comparison</div>
-                <div class="compare-row">
-                    <select class="compare-select" id="compare-a"></select>
-                    <span class="compare-vs">vs</span>
-                    <select class="compare-select" id="compare-b"></select>
-                </div>
-                <div class="compare-info" id="compare-info"></div>
-            </div>
-
         </div>
 
         <div class="calc-right">
@@ -499,8 +515,18 @@ title: Multi-Arm Experiment Calculator
                 </div>
             </div>
 
-            <!-- Results -->
-            <div class="results-panel">
+            <!-- Comparison + Results -->
+            <div class="below-chart">
+                <div class="compare-panel">
+                    <div class="compare-row">
+                        <span class="compare-label">Compare:</span>
+                        <select class="compare-select" id="compare-a"></select>
+                        <span class="compare-vs">vs</span>
+                        <select class="compare-select" id="compare-b"></select>
+                    </div>
+                    <div class="compare-info" id="compare-info"></div>
+                </div>
+                <div class="results-panel">
                 <div class="result-card power">
                     <div class="result-label">Statistical Power</div>
                     <div class="result-value" id="power-display">--</div>
@@ -510,6 +536,7 @@ title: Multi-Arm Experiment Calculator
                     <div class="result-label">Required Total N for 80% Power</div>
                     <div class="result-value" id="required-n-display">--</div>
                     <div class="result-detail">Using current traffic allocation, two-tailed</div>
+                </div>
                 </div>
             </div>
         </div>
