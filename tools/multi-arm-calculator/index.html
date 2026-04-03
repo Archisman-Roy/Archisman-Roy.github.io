@@ -269,10 +269,12 @@ title: Multi-Arm Experiment Calculator
 /* Results */
 .results-panel {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
+    margin-top: 16px;
 }
 .result-card {
+    flex: 1;
     background: #fff;
     border-radius: 10px;
     padding: 20px 16px 24px;
@@ -376,9 +378,8 @@ title: Multi-Arm Experiment Calculator
         width: 100%;
     }
     .results-panel {
-        flex-direction: row;
+        flex-direction: column;
     }
-    .result-card { flex: 1; }
 }
 </style>
 
@@ -473,20 +474,6 @@ title: Multi-Arm Experiment Calculator
                 <div class="compare-info" id="compare-info"></div>
             </div>
 
-            <!-- Results -->
-            <div class="results-panel">
-                <div class="result-card power">
-                    <div class="result-label">Statistical Power</div>
-                    <div class="result-value" id="power-display">--</div>
-                    <div class="result-detail">Probability of detecting the effect</div>
-                </div>
-                <div class="result-card sample-size">
-                    <div class="result-label">Required Total N for 80% Power</div>
-                    <div class="result-value" id="required-n-display">--</div>
-                    <div class="result-detail">Using current traffic allocation, two-tailed</div>
-                </div>
-            </div>
-
         </div>
 
         <div class="calc-right">
@@ -509,6 +496,20 @@ title: Multi-Arm Experiment Calculator
                         <div class="legend-swatch" style="background:rgba(224,93,93,0.25);border:1px solid rgba(224,93,93,0.5);height:10px;"></div>
                         <span>Rejection (&alpha;)</span>
                     </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="results-panel">
+                <div class="result-card power">
+                    <div class="result-label">Statistical Power</div>
+                    <div class="result-value" id="power-display">--</div>
+                    <div class="result-detail">Probability of detecting the effect</div>
+                </div>
+                <div class="result-card sample-size">
+                    <div class="result-label">Required Total N for 80% Power</div>
+                    <div class="result-value" id="required-n-display">--</div>
+                    <div class="result-detail">Using current traffic allocation, two-tailed</div>
                 </div>
             </div>
         </div>
