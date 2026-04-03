@@ -229,6 +229,13 @@ title: Multi-Arm Experiment Calculator
 .btn-even-split:hover {
     background: #f0fafb;
 }
+.btn-max-power {
+    border-color: #47b784;
+    color: #47b784;
+}
+.btn-max-power:hover {
+    background: #f0faf5;
+}
 
 /* Below-chart area */
 .below-chart {
@@ -437,6 +444,7 @@ title: Multi-Arm Experiment Calculator
                 <div class="alloc-footer">
                     <span class="alloc-total" id="alloc-total-wrap">Total: <span id="alloc-total">100.0</span>%</span>
                     <button class="btn-even-split" id="btn-even-split">Even Split</button>
+                    <button class="btn-even-split btn-max-power" id="btn-max-power">Max Power</button>
                 </div>
             </div>
 
@@ -654,6 +662,15 @@ title: Multi-Arm Experiment Calculator
         render();
     }
 
+    function maxPowerSplit() {
+        var ng = S.numTreatments + 1;
+        for (var i = 0; i < ng; i++) S.alloc[i] = 0;
+        S.alloc[S.compA] = 50;
+        S.alloc[S.compB] = 50;
+        buildAllocUI();
+        render();
+    }
+
     /* ---- comparison UI ---- */
     function buildCompareUI() {
         var ng = S.numTreatments + 1;
@@ -856,6 +873,7 @@ title: Multi-Arm Experiment Calculator
         setNumTreatments(S.numTreatments + 1);
     });
     document.getElementById('btn-even-split').addEventListener('click', evenSplit);
+    document.getElementById('btn-max-power').addEventListener('click', maxPowerSplit);
 
     compASelect.addEventListener('change', function () {
         S.compA = parseInt(this.value);
