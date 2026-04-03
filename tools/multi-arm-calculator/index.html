@@ -663,10 +663,11 @@ title: Multi-Arm Experiment Calculator
     }
 
     function maxPowerSplit() {
-        var ng = S.numTreatments + 1;
-        for (var i = 0; i < ng; i++) S.alloc[i] = 0;
-        S.alloc[S.compA] = 50;
-        S.alloc[S.compB] = 50;
+        var nt = S.numTreatments;
+        var fc = Math.round(1000 / (1 + Math.sqrt(nt))) / 10;
+        var ft = Math.round((100 - fc) / nt * 10) / 10;
+        S.alloc[0] = Math.round((100 - ft * nt) * 10) / 10;
+        for (var i = 1; i <= nt; i++) S.alloc[i] = ft;
         buildAllocUI();
         render();
     }
