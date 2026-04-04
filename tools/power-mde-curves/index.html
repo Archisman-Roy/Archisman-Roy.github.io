@@ -1,0 +1,842 @@
+---
+layout: default
+title: Power & MDE Curves
+---
+
+<style>
+.calculator { margin-bottom: 15px; }
+.calculator p { font-size: 1em; color: #555; margin-bottom: 1em; line-height: 1.5; }
+.calculator h1 { font-size: 2.2em; margin-bottom: 0.2em; }
+.calc-layout { display: flex; gap: 24px; align-items: flex-start; }
+.calc-left { flex: 0 0 320px; }
+.calc-right { flex: 1; min-width: 0; }
+.controls-panel {
+    background: #f7f9fb; border-radius: 10px; padding: 20px;
+    margin-bottom: 16px; border: 1px solid #e4e9ed;
+}
+.panel-title {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    font-weight: 700; color: #8a959e; text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 14px;
+}
+.control-group { margin-bottom: 16px; }
+.control-group:last-child { margin-bottom: 0; }
+.control-group.disabled .control-label { opacity: 0.4; }
+.control-label {
+    display: block; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em; font-weight: 600; color: #555;
+    margin-bottom: 6px; letter-spacing: 0.2px;
+}
+.control-input-row { display: flex; align-items: center; gap: 10px; }
+.control-slider {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 8px; background: #e4e9ed; border-radius: 20px; outline: none;
+}
+.control-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+    background: #2c3e50; border-radius: 50%; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.15s;
+}
+.control-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.control-slider::-moz-range-thumb {
+    width: 20px; height: 20px; background: #2c3e50; border-radius: 50%;
+    cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.control-slider:disabled { opacity: 0.4; }
+.control-num {
+    width: 68px; text-align: right; border: 1px solid #d5dbe0;
+    border-radius: 6px; padding: 5px 8px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.85em; font-weight: 600; color: #2c3e50; background: #fff;
+}
+.control-num:focus {
+    outline: none; border-color: #5dbcd2;
+    box-shadow: 0 0 0 2px rgba(93,188,210,0.2);
+}
+.control-num:disabled { opacity: 0.4; background: #f4f4f4; }
+
+/* Group stepper */
+.group-stepper { display: flex; align-items: center; }
+.group-stepper button {
+    width: 36px; height: 36px; border: 2px solid #d5dbe0; background: #fff;
+    font-size: 1.2em; font-weight: 700; color: #2c3e50; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; line-height: 1;
+}
+.group-stepper button:first-child { border-radius: 8px 0 0 8px; border-right: none; }
+.group-stepper button:last-child { border-radius: 0 8px 8px 0; border-left: none; }
+.group-stepper button:hover { background: #f0fafb; border-color: #5dbcd2; }
+.group-stepper span {
+    width: 48px; height: 36px; display: flex; align-items: center;
+    justify-content: center; border: 2px solid #d5dbe0;
+    font-family: 'Monaco', 'Consolas', monospace; font-size: 1em;
+    font-weight: 700; color: #2c3e50; background: #f7f9fb;
+}
+
+/* Allocation rows */
+.alloc-row { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
+.alloc-name {
+    flex: 1; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em; font-weight: 500; color: #2c3e50;
+}
+.alloc-input {
+    width: 56px; text-align: right; border: 1px solid #d5dbe0;
+    border-radius: 6px; padding: 4px 6px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.82em; font-weight: 600; color: #2c3e50; background: #fff;
+}
+.alloc-input:focus {
+    outline: none; border-color: #5dbcd2;
+    box-shadow: 0 0 0 2px rgba(93,188,210,0.2);
+}
+.alloc-pct {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em; color: #8a959e; width: 14px;
+}
+.alloc-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 12px; padding-top: 10px; border-top: 1px solid #e4e9ed;
+}
+.alloc-total {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em; font-weight: 600; color: #47b784;
+}
+.alloc-total.invalid { color: #e05d5d; }
+.btn-even-split {
+    border: 1px solid #5dbcd2; background: #fff; color: #5dbcd2;
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    font-weight: 600; padding: 4px 10px; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
+}
+.btn-even-split:hover { background: #f0fafb; }
+.btn-max-power { border-color: #47b784; color: #47b784; }
+.btn-max-power:hover { background: #f0faf5; }
+
+/* Chart options row */
+.chart-options {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 12px;
+}
+.mode-toggle {
+    display: flex; border-radius: 8px; overflow: hidden;
+    border: 2px solid #5dbcd2;
+}
+.mode-btn {
+    padding: 7px 14px; border: none; background: #fff;
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.78em;
+    font-weight: 700; color: #5dbcd2; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.mode-btn:not(:last-child) { border-right: 2px solid #5dbcd2; }
+.mode-btn.active { background: #5dbcd2; color: #fff; }
+.mode-btn:hover:not(.active) { background: #f0fafb; }
+
+/* Toggle switch */
+.multi-toggle {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
+}
+.multi-toggle input { display: none; }
+.toggle-track {
+    width: 36px; height: 20px; background: #d5dbe0; border-radius: 10px;
+    position: relative; transition: background 0.2s; flex-shrink: 0;
+}
+.toggle-thumb {
+    position: absolute; top: 2px; left: 2px; width: 16px; height: 16px;
+    background: #fff; border-radius: 50%; transition: transform 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.multi-toggle input:checked + .toggle-track { background: #5dbcd2; }
+.multi-toggle input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
+.toggle-label {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.78em;
+    font-weight: 600; color: #555;
+}
+
+/* Chart */
+.chart-container {
+    background: #fff; border-radius: 12px; border: 1px solid #e4e9ed;
+    padding: 20px 16px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.chart-container svg { width: 100%; height: auto; }
+.legend-bar {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 18px;
+    margin-top: 10px; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.75em; color: #6b7b8a;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 14px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+.legend-swatch.dashed {
+    background: repeating-linear-gradient(
+        90deg, #8a959e 0px, #8a959e 4px, transparent 4px, transparent 7px
+    );
+}
+.axis text {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; fill: #8a959e;
+}
+.axis path { stroke: none; }
+.axis line { stroke: #dde2e6; }
+.axis-label {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px;
+    fill: #8a959e; letter-spacing: 0.3px;
+}
+
+/* Below chart */
+.below-chart {
+    display: flex; gap: 16px; margin-top: 16px; align-items: stretch;
+}
+.compare-panel {
+    flex: 1; background: #f7f9fb; border-radius: 10px; padding: 16px 18px;
+    border: 1px solid #e4e9ed;
+}
+.compare-row { display: flex; align-items: center; gap: 8px; }
+.compare-label {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    font-weight: 700; color: #8a959e; text-transform: uppercase;
+    letter-spacing: 0.5px; white-space: nowrap;
+}
+.compare-select {
+    border: 1px solid #d5dbe0; border-radius: 6px; padding: 6px 8px;
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.82em;
+    font-weight: 500; color: #2c3e50; background: #fff; cursor: pointer;
+}
+.compare-select:focus { outline: none; border-color: #5dbcd2; }
+.compare-vs {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.8em;
+    font-weight: 600; color: #8a959e;
+}
+.compare-info {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    color: #6b7b8a; margin-top: 6px; line-height: 1.6;
+}
+.alloc-note {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    color: #8a959e; line-height: 1.6; margin-top: 12px;
+}
+
+/* Tooltip */
+.chart-tooltip {
+    position: absolute; pointer-events: none; opacity: 0;
+    background: #2c3e50; color: #fff; padding: 6px 10px;
+    border-radius: 6px; font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.78em; font-weight: 600; white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: opacity 0.15s;
+    z-index: 10;
+}
+.chart-tooltip::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%); border: 5px solid transparent;
+    border-top-color: #2c3e50;
+}
+
+@media (max-width: 1024px) {
+    .calc-layout { flex-direction: column; }
+    .calc-left { flex: none; width: 100%; }
+    .below-chart { flex-direction: column; }
+    .chart-options { flex-wrap: wrap; }
+}
+</style>
+
+<div class="calculator">
+    <h1>Power & MDE Curves</h1>
+    <p>Visualize how statistical power and minimum detectable effect change with sample size.</p>
+
+    <div class="calc-layout">
+        <div class="calc-left">
+
+            <!-- Groups -->
+            <div class="controls-panel">
+                <div class="panel-title">Groups</div>
+                <div class="control-group">
+                    <label class="control-label">Number of Treatment Groups</label>
+                    <div class="group-stepper">
+                        <button id="btn-minus">&minus;</button>
+                        <span id="num-treatments">1</span>
+                        <button id="btn-plus">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traffic Allocation -->
+            <div class="controls-panel">
+                <div class="panel-title">Traffic Allocation</div>
+                <div id="alloc-list"></div>
+                <div class="alloc-footer">
+                    <span class="alloc-total" id="alloc-total-wrap">Total: <span id="alloc-total">100.0</span>%</span>
+                    <button class="btn-even-split" id="btn-even-split">Even Split</button>
+                    <button class="btn-even-split btn-max-power" id="btn-max-power">Max Power</button>
+                </div>
+            </div>
+
+            <!-- Parameters -->
+            <div class="controls-panel">
+                <div class="panel-title">Parameters</div>
+                <div class="control-group">
+                    <label class="control-label">Max Sample Size (N)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-maxN"
+                               min="1000" max="500000" value="50000" step="1000">
+                        <input type="number" class="control-num" id="input-maxN"
+                               value="50000" min="100" max="10000000" step="1000">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Mean (&mu;)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-mean"
+                               min="1" max="500" value="100" step="1">
+                        <input type="number" class="control-num" id="input-mean"
+                               value="100" min="0.01" max="100000" step="1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Standard Deviation (&sigma;)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-sigma"
+                               min="1" max="50" value="10" step="0.5">
+                        <input type="number" class="control-num" id="input-sigma"
+                               value="10" min="0.01" max="10000" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Relative MDE (%)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-mde"
+                               min="0.5" max="50" value="5" step="0.5">
+                        <input type="number" class="control-num" id="input-mde"
+                               value="5" min="0.01" max="500" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Target Power (%)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-targetPower"
+                               min="50" max="99" value="80" step="1">
+                        <input type="number" class="control-num" id="input-targetPower"
+                               value="80" min="10" max="99.9" step="1">
+                    </div>
+                </div>
+                <div class="control-group" id="group-alpha">
+                    <label class="control-label">Significance Level (&alpha;)</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="slider-alpha"
+                               min="0.01" max="0.20" value="0.05" step="0.01">
+                        <input type="number" class="control-num" id="input-alpha"
+                               value="0.05" min="0.001" max="0.5" step="0.01">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="calc-right">
+            <div class="chart-options">
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="power">Y: Power</button>
+                    <button class="mode-btn" data-mode="mde">Y: MDE</button>
+                </div>
+                <label class="multi-toggle">
+                    <input type="checkbox" id="chk-multi-alpha">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    <span class="toggle-label">Compare &alpha; levels</span>
+                </label>
+            </div>
+
+            <div class="chart-container" style="position:relative;">
+                <div class="chart-tooltip" id="chart-tooltip"></div>
+                <div id="curve-chart"></div>
+                <div class="legend-bar" id="legend-bar"></div>
+            </div>
+
+            <div class="below-chart">
+                <div class="compare-panel">
+                    <div class="compare-row">
+                        <span class="compare-label">Compare:</span>
+                        <select class="compare-select" id="compare-a"></select>
+                        <span class="compare-vs">vs</span>
+                        <select class="compare-select" id="compare-b"></select>
+                    </div>
+                    <div class="compare-info" id="compare-info"></div>
+                </div>
+            </div>
+
+            <div class="alloc-note">
+                <strong>Even Split</strong> divides traffic equally across all groups (control + treatments).
+                <strong>Max Power</strong> allocates traffic to maximize power for control vs. any treatment.
+                Control receives more traffic since it is shared across all comparisons.
+                Optimal control share = 1 / (1 + &radic;n), where n is the number of treatments
+                (<a href="https://en.wikipedia.org/wiki/Dunnett%27s_test" style="color:#5dbcd2;">Dunnett allocation</a>).
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function () {
+    /* ---- math helpers ---- */
+    function cdf(x) {
+        var a1 =  0.254829592, a2 = -0.284496736, a3 = 1.421413741,
+            a4 = -1.453152027, a5 =  1.061405429, p  = 0.3275911;
+        var sign = x < 0 ? -1 : 1;
+        x = Math.abs(x) / Math.sqrt(2);
+        var t = 1 / (1 + p * x);
+        var y = 1 - (((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+        return 0.5 * (1 + sign * y);
+    }
+    function qnorm(p) {
+        if (p <= 0) return -Infinity;
+        if (p >= 1) return  Infinity;
+        if (p > 0.5) return -qnorm(1 - p);
+        var t = Math.sqrt(-2 * Math.log(p));
+        return -(t - (2.515517 + 0.802853*t + 0.010328*t*t) /
+                     (1 + 1.432788*t + 0.189269*t*t + 0.001308*t*t*t));
+    }
+
+    /* ---- state ---- */
+    var MULTI_ALPHAS = [0.05, 0.10, 0.20];
+    var MULTI_COLORS = ['#5dbcd2', '#e8a838', '#e05d5d'];
+    var SINGLE_COLOR = '#5dbcd2';
+    var REF_COLOR    = '#8a959e';
+
+    var S = {
+        numTreatments: 1,
+        alloc: [50, 50],
+        maxN: 50000,
+        mean: 100,
+        sigma: 10,
+        mde: 5,
+        targetPower: 80,
+        alpha: 0.05,
+        yMode: 'power',
+        multiAlpha: false,
+        compA: 0,
+        compB: 1
+    };
+
+    function groupName(i) { return i === 0 ? 'Control' : 'Treatment ' + i; }
+
+    /* ---- DOM refs ---- */
+    var numDisplay     = document.getElementById('num-treatments');
+    var allocListEl    = document.getElementById('alloc-list');
+    var allocTotalEl   = document.getElementById('alloc-total');
+    var allocTotalWrap = document.getElementById('alloc-total-wrap');
+    var compASelect    = document.getElementById('compare-a');
+    var compBSelect    = document.getElementById('compare-b');
+    var compInfoEl     = document.getElementById('compare-info');
+    var legendBar      = document.getElementById('legend-bar');
+    var chkMultiAlpha  = document.getElementById('chk-multi-alpha');
+    var groupAlpha     = document.getElementById('group-alpha');
+
+    /* ---- allocation UI ---- */
+    function buildAllocUI() {
+        allocListEl.innerHTML = '';
+        var ng = S.numTreatments + 1;
+        for (var i = 0; i < ng; i++) {
+            var row = document.createElement('div');
+            row.className = 'alloc-row';
+            var name = document.createElement('span');
+            name.className = 'alloc-name';
+            name.textContent = groupName(i);
+            var inp = document.createElement('input');
+            inp.type = 'number'; inp.className = 'alloc-input';
+            inp.min = '0'; inp.max = '100'; inp.step = '0.5';
+            inp.value = S.alloc[i]; inp.dataset.idx = i;
+            inp.addEventListener('input', function () {
+                var idx = parseInt(this.dataset.idx);
+                var v = parseFloat(this.value);
+                if (!isNaN(v)) S.alloc[idx] = v;
+                updateAllocTotal();
+                render();
+            });
+            var pct = document.createElement('span');
+            pct.className = 'alloc-pct'; pct.textContent = '%';
+            row.appendChild(name); row.appendChild(inp); row.appendChild(pct);
+            allocListEl.appendChild(row);
+        }
+        updateAllocTotal();
+    }
+
+    function updateAllocTotal() {
+        var sum = 0;
+        for (var i = 0; i < S.alloc.length; i++) sum += S.alloc[i];
+        allocTotalEl.textContent = sum.toFixed(1);
+        allocTotalWrap.classList.toggle('invalid', Math.abs(sum - 100) >= 0.05);
+    }
+
+    function evenSplit() {
+        var ng = S.numTreatments + 1;
+        var base = Math.floor(1000 / ng) / 10;
+        for (var i = 0; i < ng; i++) S.alloc[i] = base;
+        S.alloc[0] = Math.round((S.alloc[0] + (100 - base * ng)) * 10) / 10;
+        buildAllocUI(); render();
+    }
+
+    function maxPowerSplit() {
+        var nt = S.numTreatments;
+        var fc = Math.round(1000 / (1 + Math.sqrt(nt))) / 10;
+        var ft = Math.round((100 - fc) / nt * 10) / 10;
+        S.alloc[0] = Math.round((100 - ft * nt) * 10) / 10;
+        for (var i = 1; i <= nt; i++) S.alloc[i] = ft;
+        buildAllocUI(); render();
+    }
+
+    /* ---- comparison UI ---- */
+    function buildCompareUI() {
+        var ng = S.numTreatments + 1;
+        [compASelect, compBSelect].forEach(function (sel) {
+            var cur = parseInt(sel.value) || 0;
+            sel.innerHTML = '';
+            for (var i = 0; i < ng; i++) {
+                var o = document.createElement('option');
+                o.value = i; o.textContent = groupName(i);
+                sel.appendChild(o);
+            }
+            sel.value = cur < ng ? cur : 0;
+        });
+        S.compA = parseInt(compASelect.value);
+        S.compB = parseInt(compBSelect.value);
+        if (S.compA === S.compB) {
+            S.compB = (S.compA + 1) % ng;
+            compBSelect.value = S.compB;
+        }
+    }
+
+    function setNumTreatments(n) {
+        n = Math.max(1, Math.min(10, n));
+        S.numTreatments = n;
+        numDisplay.textContent = n;
+        var ng = n + 1;
+        while (S.alloc.length < ng) S.alloc.push(0);
+        S.alloc.length = ng;
+        evenSplit();
+        buildCompareUI();
+        render();
+    }
+
+    /* ---- chart scaffold ---- */
+    var margin = {top: 20, right: 30, bottom: 48, left: 65};
+    var W = 700, H = 370;
+    var w = W - margin.left - margin.right, h = H - margin.top - margin.bottom;
+
+    var svg = d3.select('#curve-chart').append('svg')
+        .attr('viewBox', '0 0 ' + W + ' ' + H)
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+      .append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    /* pre-create layers */
+    var curvePaths = [
+        svg.append('path').attr('fill', 'none').attr('stroke-width', 2.5),
+        svg.append('path').attr('fill', 'none').attr('stroke-width', 2.5),
+        svg.append('path').attr('fill', 'none').attr('stroke-width', 2.5)
+    ];
+    var refLine = svg.append('line')
+        .attr('stroke', REF_COLOR).attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '6,4').attr('opacity', 0.6);
+    var refLabel = svg.append('text')
+        .attr('font-family', "'Helvetica','Arial',sans-serif")
+        .attr('font-size', '10px').attr('fill', REF_COLOR);
+
+    /* tooltip */
+    var tooltip = document.getElementById('chart-tooltip');
+    var chartContainer = document.querySelector('.chart-container');
+
+    /* intersection markers (3 sets) */
+    var intMarkers = [];
+    for (var mi = 0; mi < 3; mi++) {
+        var g = svg.append('g');
+        var hitArea = g.append('circle').attr('r', 14)
+            .attr('fill', 'transparent').attr('cursor', 'pointer');
+        intMarkers.push({
+            group: g,
+            vline: g.append('line').attr('stroke-dasharray', '3,3').attr('stroke-width', 1).attr('opacity', 0.4),
+            circle: g.append('circle').attr('r', 5).attr('stroke', '#fff').attr('stroke-width', 1.5),
+            hitArea: hitArea,
+            nValue: null
+        });
+        (function (marker) {
+            marker.hitArea.on('mouseenter', function (event) {
+                if (marker.nValue === null) return;
+                var rect = chartContainer.getBoundingClientRect();
+                var svgEl = chartContainer.querySelector('svg');
+                var svgRect = svgEl.getBoundingClientRect();
+                var cx = parseFloat(marker.circle.attr('cx'));
+                var cy = parseFloat(marker.circle.attr('cy'));
+                var scaleX = svgRect.width / W;
+                var scaleY = svgRect.height / H;
+                var px = (cx + margin.left) * scaleX + svgRect.left - rect.left;
+                var py = (cy + margin.top) * scaleY + svgRect.top - rect.top;
+                tooltip.textContent = 'N = ' + marker.nValue.toLocaleString();
+                tooltip.style.opacity = '1';
+                tooltip.style.left = px + 'px';
+                tooltip.style.top = (py - 38) + 'px';
+                tooltip.style.transform = 'translateX(-50%)';
+            }).on('mouseleave', function () {
+                tooltip.style.opacity = '0';
+            });
+        })(intMarkers[mi]);
+    }
+
+    var gX = svg.append('g').attr('class', 'axis').attr('transform', 'translate(0,' + h + ')');
+    var gY = svg.append('g').attr('class', 'axis');
+    var xAxisLabel = svg.append('text').attr('class', 'axis-label').attr('text-anchor', 'middle')
+        .attr('x', w / 2).attr('y', h + 40).text('Total Sample Size');
+    var yAxisLabel = svg.append('text').attr('class', 'axis-label').attr('text-anchor', 'middle')
+        .attr('transform', 'rotate(-90)').attr('x', -h / 2).attr('y', -50);
+
+    /* ---- render ---- */
+    function render() {
+        tooltip.style.opacity = '0';
+        var fA = (S.alloc[S.compA] || 0) / 100;
+        var fB = (S.alloc[S.compB] || 0) / 100;
+
+        var alphas, colors;
+        if (S.multiAlpha) {
+            alphas = MULTI_ALPHAS; colors = MULTI_COLORS;
+        } else {
+            alphas = [S.alpha]; colors = [SINGLE_COLOR];
+        }
+        var nCurves = alphas.length;
+        var nPts = 200;
+        var minN = 20;
+
+        /* bail if degenerate allocation */
+        if (fA <= 0 || fB <= 0) {
+            for (var ci = 0; ci < 3; ci++) {
+                curvePaths[ci].attr('d', '');
+                intMarkers[ci].group.attr('display', 'none');
+            }
+            compInfoEl.innerHTML = 'Allocate traffic to both groups to see curves.';
+            return;
+        }
+
+        /* compute curves */
+        var curves = [];
+        for (var ci = 0; ci < nCurves; ci++) {
+            var alpha = alphas[ci];
+            var zc = qnorm(1 - alpha / 2);
+            var pts = [];
+
+            for (var i = 0; i <= nPts; i++) {
+                var totalN = minN + (S.maxN - minN) * i / nPts;
+                var nA = Math.max(1, Math.floor(totalN * fA));
+                var nB = Math.max(1, Math.floor(totalN * fB));
+                var se = S.sigma * Math.sqrt(1 / nA + 1 / nB);
+                var yVal;
+
+                if (S.yMode === 'power') {
+                    var delta = (S.mde / 100) * S.mean;
+                    if (delta <= 0) { pts.push([totalN, alpha]); continue; }
+                    var pow = 1 - cdf(zc - delta / se) + cdf(-zc - delta / se);
+                    yVal = Math.max(0, Math.min(1, pow));
+                } else {
+                    var zBeta = qnorm(S.targetPower / 100);
+                    var mdeAbs = (zc + zBeta) * se;
+                    yVal = (mdeAbs / Math.max(S.mean, 0.01)) * 100;
+                }
+                pts.push([totalN, yVal]);
+            }
+            curves.push(pts);
+        }
+
+        /* y domain */
+        var yLo = 0, yHi;
+        if (S.yMode === 'power') {
+            yHi = 1;
+        } else {
+            yLo = Math.max(0, S.mde * 0.4);
+            yHi = S.mde * 1.6;
+        }
+
+        var xS = d3.scaleLinear().domain([minN, S.maxN]).range([0, w]);
+        var yS = d3.scaleLinear().domain([yLo, yHi]).range([h, 0]);
+
+        var line = d3.line()
+            .x(function (d) { return xS(d[0]); })
+            .y(function (d) { return yS(d[1]); });
+
+        /* draw curves */
+        for (var ci = 0; ci < 3; ci++) {
+            if (ci < nCurves) {
+                curvePaths[ci].attr('d', line(curves[ci]))
+                    .attr('stroke', colors[ci]).attr('display', null);
+            } else {
+                curvePaths[ci].attr('display', 'none');
+            }
+        }
+
+        /* reference line */
+        var refVal = S.yMode === 'power' ? S.targetPower / 100 : S.mde;
+        var refText = S.yMode === 'power'
+            ? S.targetPower + '% power'
+            : S.mde + '% MDE';
+
+        if (refVal >= yLo && refVal <= yHi) {
+            refLine.attr('x1', 0).attr('x2', w)
+                .attr('y1', yS(refVal)).attr('y2', yS(refVal)).attr('display', null);
+            refLabel.attr('x', w - 4).attr('y', yS(refVal) - 6)
+                .attr('text-anchor', 'end').text(refText).attr('display', null);
+        } else {
+            refLine.attr('display', 'none');
+            refLabel.attr('display', 'none');
+        }
+
+        /* intersections */
+        var intResults = [];
+        for (var ci = 0; ci < 3; ci++) {
+            if (ci >= nCurves) { intMarkers[ci].group.attr('display', 'none'); continue; }
+            var pts = curves[ci];
+            var xInt = null;
+            for (var j = 1; j < pts.length; j++) {
+                var y0 = pts[j - 1][1], y1 = pts[j][1];
+                var crosses = S.yMode === 'power'
+                    ? (y0 <= refVal && y1 >= refVal)
+                    : (y0 >= refVal && y1 <= refVal);
+                if (crosses && y1 !== y0) {
+                    var t = (refVal - y0) / (y1 - y0);
+                    xInt = pts[j - 1][0] + t * (pts[j][0] - pts[j - 1][0]);
+                    break;
+                }
+            }
+
+            if (xInt !== null && xInt >= minN && xInt <= S.maxN) {
+                var nVal = Math.round(xInt);
+                intMarkers[ci].group.attr('display', null);
+                intMarkers[ci].nValue = nVal;
+                intMarkers[ci].vline
+                    .attr('x1', xS(xInt)).attr('x2', xS(xInt))
+                    .attr('y1', yS(refVal)).attr('y2', h)
+                    .attr('stroke', colors[ci]);
+                intMarkers[ci].circle
+                    .attr('cx', xS(xInt)).attr('cy', yS(refVal))
+                    .attr('fill', colors[ci]);
+                intMarkers[ci].hitArea
+                    .attr('cx', xS(xInt)).attr('cy', yS(refVal));
+                intResults.push({ alpha: alphas[ci], n: nVal });
+            } else {
+                intMarkers[ci].group.attr('display', 'none');
+                intMarkers[ci].nValue = null;
+                intResults.push({ alpha: alphas[ci], n: null });
+            }
+        }
+
+        /* compare info */
+        var info = groupName(S.compA) + ' (' + (S.alloc[S.compA] || 0).toFixed(1) + '%) vs ' +
+                   groupName(S.compB) + ' (' + (S.alloc[S.compB] || 0).toFixed(1) + '%)';
+        var nParts = intResults.map(function (r) {
+            var tag = S.multiAlpha ? ' (\u03B1=' + r.alpha.toFixed(2) + ')' : '';
+            return r.n !== null
+                ? 'N\u00A0=\u00A0' + r.n.toLocaleString() + tag
+                : '>\u00A0' + S.maxN.toLocaleString() + tag;
+        });
+        if (S.yMode === 'power') {
+            info += '<br>Required N for ' + S.targetPower + '% power: ' + nParts.join(' &middot; ');
+        } else {
+            info += '<br>N to detect ' + S.mde + '% MDE: ' + nParts.join(' &middot; ');
+        }
+        compInfoEl.innerHTML = info;
+
+        /* y-axis label */
+        yAxisLabel.text(S.yMode === 'power' ? 'Statistical Power (%)' : 'Relative MDE (%)');
+
+        /* axes */
+        if (S.yMode === 'power') {
+            gY.call(d3.axisLeft(yS).ticks(5).tickFormat(function (d) {
+                return Math.round(d * 100) + '%';
+            }));
+        } else {
+            gY.call(d3.axisLeft(yS).ticks(5).tickFormat(function (d) {
+                return d < 10 ? d.toFixed(1) + '%' : Math.round(d) + '%';
+            }));
+        }
+        gX.call(d3.axisBottom(xS).ticks(8).tickFormat(function (d) {
+            if (d >= 1000000) return (d / 1000000) + 'M';
+            if (d >= 1000) return (d / 1000) + 'K';
+            return d;
+        }));
+
+        /* legend */
+        var html = '';
+        for (var i = 0; i < nCurves; i++) {
+            html += '<div class="legend-item"><div class="legend-swatch" style="background:' +
+                colors[i] + ';"></div><span>\u03B1 = ' + alphas[i].toFixed(2) + '</span></div>';
+        }
+        html += '<div class="legend-item"><div class="legend-swatch dashed"></div><span>Target</span></div>';
+        legendBar.innerHTML = html;
+    }
+
+    /* ---- slider wiring ---- */
+    function wireSlider(key) {
+        var slider = document.getElementById('slider-' + key);
+        var input  = document.getElementById('input-' + key);
+        if (!slider || !input) return;
+        slider.addEventListener('input', function () {
+            S[key] = parseFloat(this.value);
+            input.value = this.value;
+            render();
+        });
+        input.addEventListener('input', function () {
+            var v = parseFloat(this.value);
+            if (!isNaN(v)) {
+                S[key] = v;
+                slider.value = Math.min(Math.max(v, parseFloat(slider.min)), parseFloat(slider.max));
+                render();
+            }
+        });
+    }
+    ['maxN', 'mean', 'sigma', 'mde', 'targetPower', 'alpha'].forEach(wireSlider);
+
+    /* ---- button / select wiring ---- */
+    document.getElementById('btn-minus').addEventListener('click', function () {
+        setNumTreatments(S.numTreatments - 1);
+    });
+    document.getElementById('btn-plus').addEventListener('click', function () {
+        setNumTreatments(S.numTreatments + 1);
+    });
+    document.getElementById('btn-even-split').addEventListener('click', evenSplit);
+    document.getElementById('btn-max-power').addEventListener('click', maxPowerSplit);
+
+    /* y-mode toggle */
+    document.querySelectorAll('.mode-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            S.yMode = this.dataset.mode;
+            document.querySelectorAll('.mode-btn').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.mode === S.yMode);
+            });
+            render();
+        });
+    });
+
+    /* multi-alpha toggle */
+    chkMultiAlpha.addEventListener('change', function () {
+        S.multiAlpha = this.checked;
+        document.getElementById('slider-alpha').disabled = S.multiAlpha;
+        document.getElementById('input-alpha').disabled = S.multiAlpha;
+        groupAlpha.classList.toggle('disabled', S.multiAlpha);
+        render();
+    });
+
+    /* comparison selects */
+    compASelect.addEventListener('change', function () {
+        S.compA = parseInt(this.value);
+        if (S.compA === S.compB) {
+            S.compB = (S.compA + 1) % (S.numTreatments + 1);
+            compBSelect.value = S.compB;
+        }
+        render();
+    });
+    compBSelect.addEventListener('change', function () {
+        S.compB = parseInt(this.value);
+        if (S.compA === S.compB) {
+            S.compA = (S.compB + 1) % (S.numTreatments + 1);
+            compASelect.value = S.compA;
+        }
+        render();
+    });
+
+    /* ---- init ---- */
+    buildAllocUI();
+    buildCompareUI();
+    render();
+})();
+</script>
