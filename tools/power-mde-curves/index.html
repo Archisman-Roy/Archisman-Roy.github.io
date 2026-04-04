@@ -275,36 +275,36 @@ title: Power & MDE Curves
                     <label class="control-label">Max Sample Size (N)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-maxN"
-                               min="1000" max="500000" value="50000" step="1000">
+                               min="1000" max="500000" value="48000" step="1000">
                         <input type="number" class="control-num" id="input-maxN"
-                               value="50000" min="100" max="10000000" step="1000">
+                               value="48000" min="100" max="10000000" step="1000">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">Mean (&mu;)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-mean"
-                               min="1" max="500" value="100" step="1">
+                               min="1" max="500" value="20" step="1">
                         <input type="number" class="control-num" id="input-mean"
-                               value="100" min="0.01" max="100000" step="1">
+                               value="20" min="0.01" max="100000" step="1">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">Standard Deviation (&sigma;)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-sigma"
-                               min="1" max="50" value="10" step="0.5">
+                               min="1" max="50" value="50" step="0.5">
                         <input type="number" class="control-num" id="input-sigma"
-                               value="10" min="0.01" max="10000" step="0.5">
+                               value="50" min="0.01" max="10000" step="0.5">
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label">Relative MDE (%)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-mde"
-                               min="0.5" max="50" value="5" step="0.5">
+                               min="0.5" max="50" value="11.5" step="0.5">
                         <input type="number" class="control-num" id="input-mde"
-                               value="5" min="0.01" max="500" step="0.5">
+                               value="11.5" min="0.01" max="500" step="0.5">
                     </div>
                 </div>
                 <div class="control-group">
@@ -316,13 +316,13 @@ title: Power & MDE Curves
                                value="80" min="10" max="99.9" step="1">
                     </div>
                 </div>
-                <div class="control-group" id="group-alpha">
+                <div class="control-group disabled" id="group-alpha">
                     <label class="control-label">Significance Level (&alpha;)</label>
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="slider-alpha"
-                               min="0.01" max="0.20" value="0.05" step="0.01">
+                               min="0.01" max="0.20" value="0.05" step="0.01" disabled>
                         <input type="number" class="control-num" id="input-alpha"
-                               value="0.05" min="0.001" max="0.5" step="0.01">
+                               value="0.05" min="0.001" max="0.5" step="0.01" disabled>
                     </div>
                 </div>
             </div>
@@ -336,7 +336,7 @@ title: Power & MDE Curves
                     <button class="mode-btn" data-mode="mde">Y: MDE</button>
                 </div>
                 <label class="multi-toggle">
-                    <input type="checkbox" id="chk-multi-alpha">
+                    <input type="checkbox" id="chk-multi-alpha" checked>
                     <span class="toggle-track"><span class="toggle-thumb"></span></span>
                     <span class="toggle-label">Compare &alpha; levels</span>
                 </label>
@@ -402,14 +402,14 @@ title: Power & MDE Curves
     var S = {
         numTreatments: 1,
         alloc: [50, 50],
-        maxN: 50000,
-        mean: 100,
-        sigma: 10,
-        mde: 5,
+        maxN: 48000,
+        mean: 20,
+        sigma: 50,
+        mde: 11.5,
         targetPower: 80,
         alpha: 0.05,
         yMode: 'power',
-        multiAlpha: false,
+        multiAlpha: true,
         compA: 0,
         compB: 1
     };
