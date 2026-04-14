@@ -164,6 +164,41 @@ mathjax: false
 }
 .trace-line strong { color: #2c3e50; }
 
+/* Vector input bar (horizontal, above chart) */
+.vector-inputs-bar {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    background: #f7f9fb; border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 16px;
+    border: 1px solid #e4e9ed;
+}
+.vec-input-group { flex: 1; min-width: 220px; }
+.vec-input-group-title {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    font-weight: 700; color: #8a959e; text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 10px;
+}
+.vec-component-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.vec-component-row:last-child { margin-bottom: 0; }
+.vec-component-label {
+    width: 22px; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.82em; font-weight: 600; color: #555; flex-shrink: 0;
+}
+.vec-component-row .control-slider { flex: 1; min-width: 0; }
+.vec-component-row .control-num { width: 56px; }
+
+/* Warning banner (degenerate inputs) */
+.warning-banner {
+    padding: 10px 14px; margin-bottom: 12px;
+    background: #fef5ec; border: 1px solid #f0c896;
+    border-left: 3px solid #d4781e;
+    border-radius: 6px; color: #8a4f10;
+    font-size: 0.85em; line-height: 1.5;
+    display: none;
+}
+.warning-banner.show { display: block; }
+
 /* Vector notation block */
 .vector-notation {
     display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
@@ -227,58 +262,51 @@ mathjax: false
         <div class="vec-note">Both vectors live in $\mathbb{R}^n$ where $n = 3$ is the <strong>number of observations</strong>. Each coordinate axis represents one observation &mdash; not a variable.</div>
     </div>
 
+    <div class="vector-inputs-bar">
+        <div class="vec-input-group">
+            <div class="vec-input-group-title">Predictor Vector x</div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2081;</span>
+                <input type="range" class="control-slider" id="s-x1" min="-8" max="8" value="1" step="0.5">
+                <input type="number" class="control-num" id="n-x1" value="1" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2082;</span>
+                <input type="range" class="control-slider" id="s-x2" min="-8" max="8" value="2" step="0.5">
+                <input type="number" class="control-num" id="n-x2" value="2" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2083;</span>
+                <input type="range" class="control-slider" id="s-x3" min="-8" max="8" value="3" step="0.5">
+                <input type="number" class="control-num" id="n-x3" value="3" step="0.5">
+            </div>
+        </div>
+        <div class="vec-input-group">
+            <div class="vec-input-group-title">Response Vector y</div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2081;</span>
+                <input type="range" class="control-slider" id="s-y1" min="-8" max="8" value="2" step="0.5">
+                <input type="number" class="control-num" id="n-y1" value="2" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2082;</span>
+                <input type="range" class="control-slider" id="s-y2" min="-8" max="8" value="5" step="0.5">
+                <input type="number" class="control-num" id="n-y2" value="5" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2083;</span>
+                <input type="range" class="control-slider" id="s-y3" min="-8" max="8" value="4" step="0.5">
+                <input type="number" class="control-num" id="n-y3" value="4" step="0.5">
+            </div>
+        </div>
+    </div>
+
+    <div class="warning-banner" id="warn-s1">
+        <strong>Degenerate input:</strong> $x = 0$ &mdash; OLS is undefined when the predictor vector is zero. Adjust a component of $x$ to continue.
+    </div>
+
     <div class="calc-layout">
         <div class="calc-left">
-            <div class="controls-panel">
-                <div class="panel-title">Predictor Vector x</div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2081;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x1" min="-8" max="8" value="1" step="0.5">
-                        <input type="number" class="control-num" id="n-x1" value="1" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2082;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x2" min="-8" max="8" value="2" step="0.5">
-                        <input type="number" class="control-num" id="n-x2" value="2" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2083;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x3" min="-8" max="8" value="3" step="0.5">
-                        <input type="number" class="control-num" id="n-x3" value="3" step="0.5">
-                    </div>
-                </div>
-            </div>
-
-            <div class="controls-panel">
-                <div class="panel-title">Response Vector y</div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2081;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y1" min="-8" max="8" value="2" step="0.5">
-                        <input type="number" class="control-num" id="n-y1" value="2" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2082;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y2" min="-8" max="8" value="5" step="0.5">
-                        <input type="number" class="control-num" id="n-y2" value="5" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2083;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y3" min="-8" max="8" value="4" step="0.5">
-                        <input type="number" class="control-num" id="n-y3" value="4" step="0.5">
-                    </div>
-                </div>
-            </div>
-
             <div class="controls-panel">
                 <div class="panel-title">Camera</div>
                 <div class="control-group">
@@ -370,83 +398,69 @@ mathjax: false
         <div class="vec-note">$X$ is $n \times p$ with $n = 3$ observations and $p = 2$ predictors. Each column of $X$ is a vector in $\mathbb{R}^n$. Together they span a <strong>2D plane</strong> &mdash; the column space $\text{Col}(X)$.</div>
     </div>
 
+    <div class="vector-inputs-bar">
+        <div class="vec-input-group">
+            <div class="vec-input-group-title">Predictor x&#x2081;</div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2081;&#x2081;</span>
+                <input type="range" class="control-slider" id="s-x11" min="-8" max="8" value="3" step="0.5">
+                <input type="number" class="control-num" id="n-x11" value="3" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2081;&#x2082;</span>
+                <input type="range" class="control-slider" id="s-x12" min="-8" max="8" value="1" step="0.5">
+                <input type="number" class="control-num" id="n-x12" value="1" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2081;&#x2083;</span>
+                <input type="range" class="control-slider" id="s-x13" min="-8" max="8" value="2" step="0.5">
+                <input type="number" class="control-num" id="n-x13" value="2" step="0.5">
+            </div>
+        </div>
+        <div class="vec-input-group">
+            <div class="vec-input-group-title">Predictor x&#x2082;</div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2082;&#x2081;</span>
+                <input type="range" class="control-slider" id="s-x21" min="-8" max="8" value="-1" step="0.5">
+                <input type="number" class="control-num" id="n-x21" value="-1" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2082;&#x2082;</span>
+                <input type="range" class="control-slider" id="s-x22" min="-8" max="8" value="2" step="0.5">
+                <input type="number" class="control-num" id="n-x22" value="2" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">x&#x2082;&#x2083;</span>
+                <input type="range" class="control-slider" id="s-x23" min="-8" max="8" value="3" step="0.5">
+                <input type="number" class="control-num" id="n-x23" value="3" step="0.5">
+            </div>
+        </div>
+        <div class="vec-input-group">
+            <div class="vec-input-group-title">Response Vector y</div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2081;</span>
+                <input type="range" class="control-slider" id="s-y21" min="-8" max="8" value="2" step="0.5">
+                <input type="number" class="control-num" id="n-y21" value="2" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2082;</span>
+                <input type="range" class="control-slider" id="s-y22" min="-8" max="8" value="5" step="0.5">
+                <input type="number" class="control-num" id="n-y22" value="5" step="0.5">
+            </div>
+            <div class="vec-component-row">
+                <span class="vec-component-label">y&#x2083;</span>
+                <input type="range" class="control-slider" id="s-y23" min="-8" max="8" value="4" step="0.5">
+                <input type="number" class="control-num" id="n-y23" value="4" step="0.5">
+            </div>
+        </div>
+    </div>
+
+    <div class="warning-banner" id="warn-s2">
+        <strong>Degenerate input:</strong> predictors $x_1$ and $x_2$ are collinear (or one is zero) &mdash; $X'X$ is singular and OLS is undefined. Adjust $x_1$ or $x_2$ so they point in different directions.
+    </div>
+
     <div class="calc-layout">
         <div class="calc-left">
-            <div class="controls-panel">
-                <div class="panel-title">Predictor x&#x2081;</div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2081;&#x2081;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x11" min="-8" max="8" value="3" step="0.5">
-                        <input type="number" class="control-num" id="n-x11" value="3" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2081;&#x2082;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x12" min="-8" max="8" value="1" step="0.5">
-                        <input type="number" class="control-num" id="n-x12" value="1" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2081;&#x2083;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x13" min="-8" max="8" value="2" step="0.5">
-                        <input type="number" class="control-num" id="n-x13" value="2" step="0.5">
-                    </div>
-                </div>
-            </div>
-
-            <div class="controls-panel">
-                <div class="panel-title">Predictor x&#x2082;</div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2082;&#x2081;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x21" min="-8" max="8" value="-1" step="0.5">
-                        <input type="number" class="control-num" id="n-x21" value="-1" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2082;&#x2082;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x22" min="-8" max="8" value="2" step="0.5">
-                        <input type="number" class="control-num" id="n-x22" value="2" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">x&#x2082;&#x2083;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-x23" min="-8" max="8" value="3" step="0.5">
-                        <input type="number" class="control-num" id="n-x23" value="3" step="0.5">
-                    </div>
-                </div>
-            </div>
-
-            <div class="controls-panel">
-                <div class="panel-title">Response Vector y</div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2081;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y21" min="-8" max="8" value="2" step="0.5">
-                        <input type="number" class="control-num" id="n-y21" value="2" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2082;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y22" min="-8" max="8" value="5" step="0.5">
-                        <input type="number" class="control-num" id="n-y22" value="5" step="0.5">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label">y&#x2083;</label>
-                    <div class="control-input-row">
-                        <input type="range" class="control-slider" id="s-y23" min="-8" max="8" value="4" step="0.5">
-                        <input type="number" class="control-num" id="n-y23" value="4" step="0.5">
-                    </div>
-                </div>
-            </div>
-
             <div class="controls-panel">
                 <div class="panel-title">Camera</div>
                 <div class="control-group">
@@ -569,6 +583,7 @@ mathjax: false
     }
     function inv2x2(m) {
         var d = m[0][0]*m[1][1] - m[0][1]*m[1][0];
+        if (Math.abs(d) < 1e-9) return null;
         return [[m[1][1]/d, -m[0][1]/d], [-m[1][0]/d, m[0][0]/d]];
     }
 
@@ -590,10 +605,13 @@ mathjax: false
     /* ---- OLS ---- */
     function olsLine(x, y) {
         var xty = dot(x, y), xtx = dot(x, x);
+        if (xtx < 1e-9) {
+            return { degenerate: true, xty: xty, xtx: xtx };
+        }
         var beta = xty / xtx;
         var yhat = scl(x, beta);
         var e = sub(y, yhat);
-        return { beta: beta, yhat: yhat, e: e, xte: dot(x, e), xty: xty, xtx: xtx };
+        return { degenerate: false, beta: beta, yhat: yhat, e: e, xte: dot(x, e), xty: xty, xtx: xtx };
     }
     function olsPlane(cols, y) {
         var n = y.length;
@@ -601,10 +619,13 @@ mathjax: false
         for (var i = 0; i < n; i++) X.push(cols.map(function(c) { return c[i]; }));
         var Xt = transpose(X);
         var XtX_inv = inv2x2(matMul(Xt, X));
+        if (XtX_inv === null) {
+            return { degenerate: true };
+        }
         var Xty = Xt.map(function(row) { return dot(row, y); });
         var beta = XtX_inv.map(function(row) { return dot(row, Xty); });
         var yhat = X.map(function(row) { return dot(row, beta); });
-        return { beta: beta, yhat: yhat, e: sub(y, yhat), H: matMul(matMul(X, XtX_inv), Xt) };
+        return { degenerate: false, beta: beta, yhat: yhat, e: sub(y, yhat), H: matMul(matMul(X, XtX_inv), Xt) };
     }
     /* ---- SVG drawing ---- */
     /* cam = {az, el, rl, cx, cy, s} */
@@ -649,6 +670,15 @@ mathjax: false
             var v = parseFloat(nm.value);
             if (!isNaN(v)) { sl.value = Math.max(sl.min, Math.min(sl.max, v)); cb(); }
         });
+        nm.addEventListener('change', function() {
+            var v = parseFloat(nm.value);
+            if (!isNaN(v)) {
+                var clamped = Math.max(parseFloat(sl.min), Math.min(parseFloat(sl.max), v));
+                sl.value = clamped;
+                nm.value = clamped;
+                cb();
+            }
+        });
     }
 
     /* ==== Section 1 ==== */
@@ -681,6 +711,36 @@ mathjax: false
         /* Vector notation displays */
         renderVecKatex('vec-x-display', 'x', x1Vec);
         renderVecKatex('vec-y-display', 'y', y);
+
+        /* Degenerate handling */
+        var warn = document.getElementById('warn-s1');
+        if (fit.degenerate) {
+            warn.classList.add('show');
+            document.getElementById('val-beta').innerHTML = '&mdash;';
+            document.getElementById('val-xte').innerHTML = '&mdash;';
+            document.getElementById('txt-xty').textContent = fit.xty.toFixed(1);
+            document.getElementById('txt-xtx').textContent = '0';
+            document.getElementById('txt-beta2').textContent = 'undefined';
+            document.getElementById('txt-yhat').textContent = '—';
+            document.getElementById('txt-e').textContent = '—';
+            document.getElementById('txt-xte').textContent = '—';
+            document.getElementById('chk-xte').innerHTML = '';
+            document.getElementById('txt-ny2').textContent = '—';
+            document.getElementById('txt-nyh2').textContent = '—';
+            document.getElementById('txt-ne2').textContent = '—';
+            document.getElementById('chk-pyth').innerHTML = '';
+
+            /* Draw axes + y only */
+            var svgD = document.getElementById('svg1');
+            var hD = drawAxes(cam);
+            hD += arw([0,0,0], y, C.y, cam);
+            hD += lbl(y, 'y', C.y, cam, 8, -10);
+            var opD = proj3D(0,0,0, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
+            hD += '<circle cx="'+opD[0]+'" cy="'+opD[1]+'" r="3" fill="'+C.dot+'"/>';
+            svgD.innerHTML = hD;
+            return;
+        }
+        warn.classList.remove('show');
 
         /* Result cards */
         document.getElementById('val-beta').textContent = fit.beta.toFixed(3);
@@ -781,6 +841,32 @@ mathjax: false
             katex.render('X = \\begin{pmatrix} ' + vx1[0] + ' & ' + vx2[0] + ' \\\\ ' + vx1[1] + ' & ' + vx2[1] + ' \\\\ ' + vx1[2] + ' & ' + vx2[2] + ' \\end{pmatrix}', xEl, { throwOnError: false });
         }
         renderVecKatex('vec-y2-display', 'y', y);
+
+        /* Degenerate handling */
+        var warn2 = document.getElementById('warn-s2');
+        if (fit.degenerate) {
+            warn2.classList.add('show');
+            document.getElementById('val-b1').innerHTML = '&mdash;';
+            document.getElementById('val-b2').innerHTML = '&mdash;';
+            document.getElementById('mat-h').innerHTML = '';
+            document.getElementById('mat-h2').innerHTML = '';
+            document.getElementById('txt-trh').innerHTML = '<strong>tr(<em>H</em>)</strong> is undefined &mdash; $X\'X$ is singular.';
+
+            /* Draw axes + x1 + x2 + y only */
+            var svgD2 = document.getElementById('svg2');
+            var hD2 = drawAxes(cam);
+            hD2 += arw([0,0,0], vx1, C.x1, cam);
+            hD2 += arw([0,0,0], vx2, C.x2, cam);
+            hD2 += arw([0,0,0], y, C.y, cam);
+            hD2 += lbl(scl(vx1,1.1), 'x\u2081', C.x1, cam, 0, 0);
+            hD2 += lbl(scl(vx2,1.1), 'x\u2082', C.x2, cam, 0, 0);
+            hD2 += lbl(y, 'y', C.y, cam, 8, -10);
+            var opD2 = proj3D(0,0,0, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
+            hD2 += '<circle cx="'+opD2[0]+'" cy="'+opD2[1]+'" r="3" fill="'+C.dot+'"/>';
+            svgD2.innerHTML = hD2;
+            return;
+        }
+        warn2.classList.remove('show');
 
         /* Result cards */
         document.getElementById('val-b1').textContent = fit.beta[0].toFixed(3);
