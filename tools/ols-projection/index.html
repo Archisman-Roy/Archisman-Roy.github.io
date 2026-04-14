@@ -262,6 +262,41 @@ mathjax: false
         <div class="vec-note">Both vectors live in $\mathbb{R}^n$ where $n = 3$ is the <strong>number of observations</strong>. Each coordinate axis represents one observation &mdash; not a variable.</div>
     </div>
 
+    <details class="derivation" style="margin-top: 0; margin-bottom: 16px;">
+        <summary>Why are the axes observations?</summary>
+        <div class="derivation-body">
+            <p style="margin-top: 0;">The usual regression plot flips this view. Seeing the dual representation is what lets us talk about OLS as a projection.</p>
+            <div class="matrix-cols">
+                <div>
+                    <div class="sub-label">Scatterplot view</div>
+                    <div class="sub-detail">The familiar one</div>
+                    <ul style="padding-left: 20px; margin: 0; line-height: 1.7;">
+                        <li>Axes = variables (predictor, response)</li>
+                        <li>Each point = one observation</li>
+                        <li>$n$ observations &rarr; $n$ points in a 2D plot</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="sub-label">Observation space</div>
+                    <div class="sub-detail">This view</div>
+                    <ul style="padding-left: 20px; margin: 0; line-height: 1.7;">
+                        <li>Axes = observations (obs 1, obs 2, obs 3)</li>
+                        <li>Each vector = one variable &mdash; $x$ and $y$ each collapse to a single arrow</li>
+                        <li>$n$ observations &rarr; vectors in $\mathbb{R}^n$, regardless of how many variables you have</li>
+                    </ul>
+                </div>
+            </div>
+            <p style="margin-top: 18px;"><strong>Why bother with the flip?</strong> Because $y$ and every column of $X$ are $n$-dimensional vectors in the <em>same</em> space, you can ask: "What is the closest point in $\text{Col}(X)$ to $y$?" That's a projection &mdash; a geometric question with a geometric answer. In the scatterplot view the question is not even well-posed.</p>
+            <p><strong>Concrete bridge.</strong> With your current inputs $x =$ <span class="deriv-val" id="dv-x">...</span> and $y =$ <span class="deriv-val" id="dv-y">...</span>:</p>
+            <ul style="padding-left: 20px; margin: 0; line-height: 1.9;">
+                <li><strong>Scatterplot view:</strong> three points &mdash; <span class="deriv-val" id="dv-scatter">...</span></li>
+                <li><strong>Observation-space view:</strong> two vectors in $\mathbb{R}^3$ &mdash; one pointing to <span class="deriv-val" id="dv-vec-x">...</span>, the other to <span class="deriv-val" id="dv-vec-y">...</span></li>
+            </ul>
+            <p style="color:#8a959e; font-size: 0.92em; margin-top: 10px;">Same data, two representations.</p>
+            <p><strong>Scaling.</strong> A real dataset with $n = 100$ observations lives in $\mathbb{R}^{100}$. The geometry is identical to what's shown here &mdash; we use $n = 3$ only so it fits on a page. Adding predictors doesn't enlarge the ambient space; it adds more vectors whose span becomes $\text{Col}(X)$.</p>
+        </div>
+    </details>
+
     <div class="vector-inputs-bar">
         <div class="vec-input-group">
             <div class="vec-input-group-title">Predictor Vector x</div>
@@ -711,6 +746,17 @@ mathjax: false
         /* Vector notation displays */
         renderVecKatex('vec-x-display', 'x', x1Vec);
         renderVecKatex('vec-y-display', 'y', y);
+
+        /* Dual-view concrete bridge */
+        var tup = function(arr) { return '(' + arr.join(', ') + ')'; };
+        document.getElementById('dv-x').textContent = tup(x1Vec);
+        document.getElementById('dv-y').textContent = tup(y);
+        document.getElementById('dv-scatter').textContent =
+            '(' + x1Vec[0] + ', ' + y[0] + '), (' +
+            x1Vec[1] + ', ' + y[1] + '), (' +
+            x1Vec[2] + ', ' + y[2] + ')';
+        document.getElementById('dv-vec-x').textContent = tup(x1Vec);
+        document.getElementById('dv-vec-y').textContent = tup(y);
 
         /* Degenerate handling */
         var warn = document.getElementById('warn-s1');
