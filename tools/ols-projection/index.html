@@ -1,0 +1,687 @@
+---
+layout: default
+title: "OLS as Projection"
+description: "Interactive geometric interpretation of ordinary least squares regression"
+mathjax: false
+---
+
+<!-- STANDALONE MODE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLS as Projection</title>
+-->
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});">
+</script>
+
+<style>
+.ols-container {
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+.ols-section { margin: 3rem 0; }
+
+.ols-split {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .ols-split { grid-template-columns: 1fr; }
+}
+
+.ols-math-panel {
+  font-size: 14px;
+  line-height: 1.8;
+  padding: 1rem;
+  background: var(--ols-card-bg);
+  border-radius: 8px;
+}
+
+.ols-svg { width: 100%; cursor: grab; border-radius: 8px; background: var(--ols-bg); user-select: none; }
+.ols-svg:active { cursor: grabbing; }
+
+.ols-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.ols-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ols-controls input[type="range"] { width: 110px; }
+
+.ols-controls input[type="number"] {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid var(--ols-border);
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  background: transparent;
+  color: var(--ols-text);
+}
+
+.ols-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.ols-stat-card {
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background: var(--ols-card-bg);
+}
+
+.ols-stat-card .label { font-size: 12px; color: var(--ols-text-muted); }
+.ols-stat-card .value { font-size: 20px; font-weight: 500; margin-top: 2px; }
+
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  margin: 1rem 0 0.5rem;
+}
+
+.matrix-grid {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 14px;
+  text-align: right;
+  padding: 8px;
+  border-left: 2px solid;
+  border-right: 2px solid;
+}
+
+.code-inline {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 0.9em;
+  background: var(--ols-card-bg);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+:root {
+  --ols-text: #2C2C2A;
+  --ols-text-muted: #73726c;
+  --ols-bg: #ffffff;
+  --ols-svg-bg: #fdfdfc;
+  --ols-card-bg: #f5f5f0;
+  --ols-border: #d3d1c7;
+  --ols-ok: #4CAF50;
+  --ols-err: #F44336;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ols-text: #e0ddd4;
+    --ols-text-muted: #9c9a92;
+    --ols-bg: #1a1a18;
+    --ols-svg-bg: #1a1a18;
+    --ols-card-bg: #242422;
+    --ols-border: #444441;
+  }
+}
+
+.ols-container { color: var(--ols-text); }
+.ols-controls { color: var(--ols-text-muted); }
+
+.check-ok { color: var(--ols-ok); font-weight: bold; }
+.check-err { color: var(--ols-err); font-weight: bold; }
+
+.section-head {
+    border-bottom: 2px solid var(--ols-border);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    margin-top: 16px;
+    font-weight: 600;
+}
+.section-head:first-child { margin-top: 0; }
+</style>
+
+<div class="ols-container">
+    <p>This interactive visualization teaches the geometric interpretation of Ordinary Least Squares (OLS) regression as an orthogonal projection in observation space ($\mathbb{R}^n$).</p>
+
+    <!-- Hidden Arrow Definition -->
+    <svg style="position:absolute;width:0;height:0">
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+        </defs>
+    </svg>
+
+    <div class="ols-section">
+        <h2>Section 1: Start with numbers</h2>
+        
+        <div class="ols-split">
+            <!-- Math Panel -->
+            <div class="ols-math-panel">
+                <div class="section-head">Vectors in $\mathbb{R}^3$</div>
+                <div>$x = (1, 2, 3)$ <span style="color:var(--ols-text-muted); font-size: 0.9em">(fixed predictor)</span></div>
+                <div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">
+                    $y = ($ 
+                    <input type="number" id="y1-input" value="2" step="0.5">,
+                    <input type="number" id="y2-input" value="5" step="0.5">,
+                    <input type="number" id="y3-input" value="4" step="0.5">
+                    $)$
+                </div>
+
+                <div class="section-head">OLS projection</div>
+                <div>
+                    $\hat{\beta} = \frac{x'y}{x'x} = \frac{\text{<span id="txt-xty">...</span>}}{\text{<span id="txt-xtx">...</span>}} =$ <b><span id="txt-betaHat">...</span></b>
+                </div>
+                <div style="margin-top: 8px;">
+                    $\hat{y} = \hat{\beta} \cdot x =$ <span class="code-inline" id="txt-yhat">(...)</span>
+                </div>
+                <div style="margin-top: 4px;">
+                    $e = y - \hat{y} =$ <span class="code-inline" id="txt-e">(...)</span>
+                </div>
+
+                <div class="section-head">Orthogonality check</div>
+                <div>
+                    $x'e = x_1 e_1 + x_2 e_2 + x_3 e_3 =$ <span id="txt-xte">...</span> <span id="txt-xte-check"></span>
+                </div>
+
+                <div class="section-head">Pythagorean theorem</div>
+                <div>
+                    $\|y\|^2 = \|\hat{y}\|^2 + \|e\|^2$ <span id="txt-pyth-check"></span>
+                </div>
+                <div>
+                    <span id="txt-norm-y">...</span> = <span id="txt-norm-yhat">...</span> + <span id="txt-norm-e">...</span> 
+                </div>
+            </div>
+
+            <!-- SVG 1 -->
+            <div>
+                <svg class="ols-svg" id="svg1" viewBox="0 0 680 500" width="100%"></svg>
+                <div class="ols-controls">
+                    <label>Rotate: <input type="range" id="rot1" min="0" max="360" value="55" step="1"></label>
+                    <label>Tilt: <input type="range" id="tlt1" min="5" max="85" value="28" step="1"></label>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top:20px; padding:10px; border-left: 3px solid var(--ols-border); background: var(--ols-card-bg);">
+            The vector $x = (1,2,3)$ lives in $\mathbb{R}^3$ — one axis per observation. The column space $\text{Col}(X)$ is the line through the origin along $x$: every possible fitted vector $\hat{y} = \beta \cdot x$ lies somewhere on this line. OLS finds the point on this line closest to $y$, which is the orthogonal projection. The residual $e$ is perpendicular to the line — that's the normal equation $x'e = 0$ in action.
+        </p>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="ols-section">
+        <h2>Section 2: Two predictors, a plane</h2>
+        <p>With one predictor, $\text{Col}(X)$ was a line. Add a second predictor and it becomes a plane — a 2D subspace in $\mathbb{R}^3$. The projection $\hat{y}$ is now the closest point on this plane to $y$, and the residual $e$ is perpendicular to the entire plane.</p>
+
+        <div>
+            <svg class="ols-svg" id="svg2" viewBox="0 0 680 520" width="100%"></svg>
+            <div class="ols-controls">
+                <label>Rotate: <input type="range" id="rot2" min="0" max="360" value="70" step="1"></label>
+                <label>Tilt: <input type="range" id="tlt2" min="5" max="85" value="25" step="1"></label>
+                <label>Move y (noise): <input type="range" id="move-y" min="-15" max="15" value="4" step="0.5"></label>
+            </div>
+        </div>
+
+        <details>
+            <summary>Hat matrix properties</summary>
+            <div style="background:var(--ols-card-bg); padding:1.5rem; border-radius:8px;">
+                <p>The hat matrix $H = X(X'X)^{-1}X'$ projects $y$ onto the plane. For our current data:</p>
+                <div style="font-size: 1.1em; display:flex; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom: 20px;">
+                    <div>$H =$</div>
+                    <div class="matrix-grid" id="matrix-h"></div>
+                </div>
+
+                <div class="ols-split" style="gap:1rem; grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <b>$H$ is idempotent: $H^2 = H$</b>
+                        <p style="font-size:0.9em;color:var(--ols-text-muted);">Projecting twice onto the same subspace gives the same result as projecting once.</p>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="matrix-grid" id="matrix-h2"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <b>$\text{rank}(H) = \text{tr}(H) = 2$</b>
+                        <p style="font-size:0.9em;color:var(--ols-text-muted);">The projection maps onto a 2-dimensional subspace. This is where 'degrees of freedom consumed by the model' comes from.</p>
+                        <div class="code-inline" id="tr-h">tr(H) = ...</div>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <p style="margin-top:20px; padding:10px; border-left: 3px solid var(--ols-border); background: var(--ols-card-bg);">
+            The normal equations $X'e = 0$ say that $e$ is perpendicular to every column of $X$ — both $x_1$ and $x_2$. Since these columns span the plane, $e$ is perpendicular to the entire plane. This is the defining property of orthogonal projection, and it's exactly what 'least squares' means geometrically: the shortest path from $y$ to a subspace is always perpendicular.
+        </p>
+    </div>
+
+    <!-- Takeaways -->
+    <div class="ols-section" style="background: var(--ols-card-bg); padding: 1.5rem; border-radius: 8px;">
+        <h3>Key Takeaways</h3>
+        <ol style="line-height:1.8;">
+            <li><b>$\hat{y}$ is a projection</b>: $\hat{y} = Hy$ is the orthogonal projection of $y$ onto $\text{Col}(X)$.</li>
+            <li><b>$e$ is orthogonal</b>: The residual $e = y - \hat{y}$ satisfies $X'e = 0$, meaning $e \perp \text{Col}(X)$.</li>
+            <li><b>Pythagoras gives the ANOVA decomposition</b>: $\|y\|^2 = \|\hat{y}\|^2 + \|e\|^2$, i.e., $SST = SSR + SSE$.</li>
+            <li><b>Adding predictors expands the subspace</b>: More columns in $X$ &rarr; larger $\text{Col}(X)$ &rarr; projection can only get closer to $y$ &rarr; $R^2$ can only increase.</li>
+            <li><b>$\text{tr}(H) = p$ gives degrees of freedom</b>: The model "uses up" $p$ degrees of freedom; the residual has $n - p$.</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// ==== Core Configuration & styling variables ====
+const setupGraphics = () => {
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  return {
+    x1:         dark ? '#9FE1CB' : '#0F6E56',     // teal (x1)
+    x2:         dark ? '#B5D4F4' : '#185FA5',     // blue (x2, section 1 x)
+    y:          dark ? '#F5C4B3' : '#993C1D',     // coral
+    yhat:       dark ? '#C0DD97' : '#3B6D11',     // green
+    residual:   dark ? '#F7C1C1' : '#A32D2D',     // red
+    plane:      dark ? 'rgba(93,202,165,0.12)' : 'rgba(93,202,165,0.15)',
+    planeStroke:dark ? 'rgba(93,202,165,0.35)' : 'rgba(29,158,117,0.4)',
+    grid:       dark ? 'rgba(93,202,165,0.15)' : 'rgba(29,158,117,0.12)',
+    axis:       dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+    axisLabel:  dark ? 'rgba(255,255,255,0.4)'  : 'rgba(0,0,0,0.35)'
+  };
+};
+
+let COLORS = setupGraphics();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    COLORS = setupGraphics();
+    drawSection1();
+    drawSection2();
+});
+
+// ==== Math Helpers ====
+function project3D(x, y, z, azimuth, elevation, cx, cy, scale) {
+  const ca = Math.cos(azimuth), sa = Math.sin(azimuth);
+  const ce = Math.cos(elevation), se = Math.sin(elevation);
+  const rx = -x * sa + z * ca;
+  const ry = -x * ca * se - z * sa * se + y * ce;
+  return [cx + rx * scale, cy - ry * scale];
+}
+
+function dot(a, b) { return a.reduce((s, v, i) => s + v * b[i], 0); }
+function add(a, b) { return a.map((v, i) => v + b[i]); }
+function sub(a, b) { return a.map((v, i) => v - b[i]); }
+function scaleVec(v, s) { return v.map(x => x * s); }
+function norm(v) { return Math.sqrt(dot(v, v)); }
+function normalize(v) { const l = norm(v); return l > 0 ? scaleVec(v, 1/l) : v; }
+function cross(a, b) { return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+
+function transpose(A) {
+  if (A.length === 0) return [];
+  return A[0].map((_, c) => A.map(r => r[c]));
+}
+
+function matMul(A, B) {
+  let result = [];
+  for (let i = 0; i < A.length; i++) {
+    result[i] = [];
+    for (let j = 0; j < B[0].length; j++) {
+      let sum = 0;
+      for (let k = 0; k < A[0].length; k++) {
+        sum += A[i][k] * B[k][j];
+      }
+      result[i][j] = sum;
+    }
+  }
+  return result;
+}
+
+function invert2x2([[a,b],[c,d]]) {
+  const det = a*d - b*c;
+  return [[d/det, -b/det], [-c/det, a/det]];
+}
+
+// ==== OLS logic ====
+function olsFitLine(x, y) {
+  const xty = dot(x, y);
+  const xtx = dot(x, x);
+  const betaHat = xty / xtx;
+  const yhat = scaleVec(x, betaHat);
+  const residuals = sub(y, yhat);
+  const xte = dot(x, residuals);
+  return { betaHat, yhat, residuals, xte, xty, xtx };
+}
+
+function olsFit(columns, y) {
+  const n = y.length;
+  const p = columns.length;
+  const X = [];
+  for (let i = 0; i < n; i++) X.push(columns.map(col => col[i]));
+
+  const Xt = transpose(X);
+  const XtX = matMul(Xt, X);
+  const XtX_inv = invert2x2(XtX);
+  const Xty = Xt.map(row => dot(row, y));
+
+  const beta = XtX_inv.map(row => dot(row, Xty));
+  const yhat = X.map(row => dot(row, beta));
+  const residuals = sub(y, yhat);
+
+  const X_XtXinv = matMul(X, XtX_inv);
+  const hatMatrix = matMul(X_XtXinv, Xt);   
+
+  const SSE = dot(residuals, residuals);
+  const SST = y.reduce((s, v) => { const dif = v - (y.reduce((a,b)=>a+b,0)/n); return s + dif*dif; }, 0);
+  
+  return { beta, yhat, residuals, hatMatrix, SSE, SST };
+}
+
+function decomposeWrtPlane(y, v1, v2) {
+  const n = normalize(cross(v1, v2));   
+  const offPlane = dot(y, n);           
+  const yOnPlane = sub(y, scaleVec(n, offPlane));
+  return { yOnPlane, offPlane, normal: n };
+}
+
+function reconstructY(yOnPlane, normal, offPlaneMagnitude) {
+  return add(yOnPlane, scaleVec(normal, offPlaneMagnitude));
+}
+
+// ==== Draw Helpers ====
+function d3pt(xyz, az, el, cx, cy, s) {
+    const pt = project3D(xyz[0], xyz[1], xyz[2], az, el, cx, cy, s);
+    return `${pt[0].toFixed(1)},${pt[1].toFixed(1)}`;
+}
+
+function drawAxes(az, el, cx, cy, s) {
+    let html = '';
+    const len = 6;
+    const ax = [
+        [[len,0,0], "obs 1"], [[-len,0,0], ""],
+        [[0,len,0], "obs 2"], [[0,-len,0], ""],
+        [[0,0,len], "obs 3"], [[0,0,-len], ""]
+    ];
+    for (let c of ax) {
+        const origin = project3D(0,0,0, az,el, cx,cy, s);
+        const end = project3D(c[0][0], c[0][1], c[0][2], az,el, cx,cy, s);
+        html += `<path d="M${origin[0]},${origin[1]} L${end[0]},${end[1]}" stroke="${COLORS.axis}" stroke-dasharray="4 3" stroke-width="0.8" fill="none" />`;
+        if (c[1]) {
+            const loc = project3D(c[0][0]*1.15, c[0][1]*1.15, c[0][2]*1.15, az,el, cx,cy, s);
+            html += `<text x="${loc[0]}" y="${loc[1]}" fill="${COLORS.axisLabel}" font-size="12px" text-anchor="middle" dominant-baseline="middle">${c[1]}</text>`;
+        }
+    }
+    return html;
+}
+
+// ==== Section 1 ====
+let y1 = [2, 5, 4];
+const x1Vec = [1, 2, 3];
+
+function drawSection1() {
+  const az = document.getElementById('rot1').value * Math.PI / 180;
+  const el = document.getElementById('tlt1').value * Math.PI / 180;
+  const svg = document.getElementById('svg1');
+  const cx = 340, cy = 250, s = 25;
+
+  // Sync inputs
+  document.getElementById('y1-input').value = y1[0];
+  document.getElementById('y2-input').value = y1[1];
+  document.getElementById('y3-input').value = y1[2];
+
+  const fit = olsFitLine(x1Vec, y1);
+
+  // Update text
+  document.getElementById('txt-xty').innerText = fit.xty.toFixed(1);
+  document.getElementById('txt-xtx').innerText = fit.xtx.toFixed(1);
+  document.getElementById('txt-betaHat').innerText = fit.betaHat.toFixed(3);
+  
+  document.getElementById('txt-yhat').innerText = "(" + fit.yhat.map(v => v.toFixed(2)).join(', ') + ")";
+  document.getElementById('txt-e').innerText = "(" + fit.residuals.map(v => v.toFixed(2)).join(', ') + ")";
+  
+  const xeStr = fit.xte.toFixed(6);
+  document.getElementById('txt-xte').innerText = xeStr;
+  document.getElementById('txt-xte-check').innerHTML = Math.abs(fit.xte) < 0.001 ? '<span class="check-ok">✓</span>' : '<span class="check-err">✗</span>';
+
+  const ny2 = dot(y1, y1);
+  const nYh2 = dot(fit.yhat, fit.yhat);
+  const ne2 = dot(fit.residuals, fit.residuals);
+  
+  document.getElementById('txt-norm-y').innerText = ny2.toFixed(1);
+  document.getElementById('txt-norm-yhat').innerText = nYh2.toFixed(1);
+  document.getElementById('txt-norm-e').innerText = ne2.toFixed(1);
+
+  const diff_pyth = Math.abs(ny2 - (nYh2 + ne2));
+  document.getElementById('txt-pyth-check').innerHTML = diff_pyth < 0.01 ? '<span class="check-ok">✓</span>' : '<span class="check-err">✗</span>';
+
+  // Draw SVG
+  let h = drawAxes(az, el, cx, cy, s);
+
+  // Col(X) line
+  const colLineFar = scaleVec(x1Vec, 2.5);
+  const colLineNear = scaleVec(x1Vec, -2.5);
+  h += `<path d="M${d3pt(colLineNear, az, el, cx, cy, s)} L${d3pt(colLineFar, az, el, cx, cy, s)}" stroke="${COLORS.x2}" stroke-width="1.5" opacity="0.4" fill="none" />`;
+  
+  for(let t=-2.5; t<=2.5; t+=0.3) {
+      const pt = scaleVec(x1Vec, t);
+      const pr = project3D(pt[0], pt[1], pt[2], az, el, cx, cy, s);
+      h += `<circle cx="${pr[0]}" cy="${pr[1]}" r="1.5" fill="${COLORS.x2}" opacity="0.4" />`;
+  }
+
+  // Vector x
+  const px = d3pt(x1Vec, az, el, cx, cy, s);
+  const p0 = d3pt([0,0,0], az, el, cx, cy, s);
+  h += `<path d="M${p0} L${px}" stroke="${COLORS.x2}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  const lx = project3D(x1Vec[0], x1Vec[1], x1Vec[2], az, el, cx, cy, s);
+  h += `<text x="${lx[0]+12}" y="${lx[1]-8}" fill="${COLORS.x2}" font-size="13px">x</text>`;
+
+  // Vector y
+  const py = d3pt(y1, az, el, cx, cy, s);
+  h += `<path d="M${p0} L${py}" stroke="${COLORS.y}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  const ly = project3D(y1[0], y1[1], y1[2], az, el, cx, cy, s);
+  h += `<text x="${ly[0]+8}" y="${ly[1]-8}" fill="${COLORS.y}" font-size="13px" font-weight="600">y</text>`;
+
+  // Vector yhat
+  const pyh = d3pt(fit.yhat, az, el, cx, cy, s);
+  h += `<path d="M${p0} L${pyh}" stroke="${COLORS.yhat}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  const lyh = project3D(fit.yhat[0], fit.yhat[1], fit.yhat[2], az, el, cx, cy, s);
+  h += `<text x="${lyh[0]+12}" y="${lyh[1]+12}" fill="${COLORS.yhat}" font-size="13px" font-weight="600">ŷ = β̂x</text>`;
+
+  // e
+  h += `<path d="M${pyh} L${py}" stroke="${COLORS.residual}" stroke-width="2" stroke-dasharray="6 4" fill="none" />`;
+  const le = project3D((y1[0]+fit.yhat[0])/2, (y1[1]+fit.yhat[1])/2, (y1[2]+fit.yhat[2])/2, az,el, cx,cy, s);
+  h += `<text x="${le[0]+14}" y="${le[1]}" fill="${COLORS.residual}" font-size="13px" font-weight="600">e = y - ŷ</text>`;
+
+  // Right angle
+  const e_dir = normalize(fit.residuals);
+  const yh_dir = normalize(fit.yhat);
+  const arm1 = add(fit.yhat, scaleVec(e_dir, 0.6));
+  const arm2 = add(arm1, scaleVec(yh_dir, -0.6));
+  const arm3 = add(fit.yhat, scaleVec(yh_dir, -0.6));
+  h += `<polyline points="${pyh} ${d3pt(arm1, az,el,cx,cy,s)} ${d3pt(arm2, az,el,cx,cy,s)} ${d3pt(arm3, az,el,cx,cy,s)}" stroke="${COLORS.residual}" stroke-width="1.5" fill="none" opacity="0.6" />`;
+
+  h += `<circle cx="${p0.split(',')[0]}" cy="${p0.split(',')[1]}" r="3" fill="${COLORS.text}" />`;
+
+  svg.innerHTML = h;
+}
+
+['y1-input', 'y2-input', 'y3-input'].forEach((id, idx) => {
+    document.getElementById(id).addEventListener('input', e => {
+        const v = parseFloat(e.target.value);
+        if(!isNaN(v)) { y1[idx] = v; drawSection1(); }
+    });
+});
+['rot1', 'tlt1'].forEach(id => {
+    document.getElementById(id).addEventListener('input', drawSection1);
+});
+
+// ==== Section 2 ====
+const vx1 = [3, 1, 2];
+const vx2 = [-1, 2, 3];
+const y2_base = [2, 5, 4];
+const { yOnPlane: yPlaneBase, normal: planeNormal } = decomposeWrtPlane(y2_base, vx1, vx2);
+
+function formatMatrix(mat) {
+    let ht = '';
+    for(let r=0; r<mat.length; r++) {
+        for(let c=0; c<mat[r].length; c++) {
+            ht += `<div>${mat[r][c].toFixed(3)}</div>`;
+        }
+    }
+    return ht;
+}
+
+function drawSection2() {
+  const az = document.getElementById('rot2').value * Math.PI / 180;
+  const el = document.getElementById('tlt2').value * Math.PI / 180;
+  const moveOff = parseFloat(document.getElementById('move-y').value);
+  const y = reconstructY(yPlaneBase, planeNormal, moveOff);
+  const svg = document.getElementById('svg2');
+  const cx = 340, cy = 260, s = 25;
+
+  const fit = olsFit([vx1, vx2], y);
+
+  let h = drawAxes(az, el, cx, cy, s);
+
+  // Plane
+  const corners = [
+      add(scaleVec(vx1, 1.2), scaleVec(vx2, 1.2)),
+      add(scaleVec(vx1, 1.2), scaleVec(vx2, -1.2)),
+      add(scaleVec(vx1, -1.2), scaleVec(vx2, -1.2)),
+      add(scaleVec(vx1, -1.2), scaleVec(vx2, 1.2))
+  ];
+  const pts = corners.map(c => d3pt(c, az, el, cx,cy,s)).join(' ');
+  h += `<polygon points="${pts}" fill="${COLORS.plane}" stroke="${COLORS.planeStroke}" stroke-width="0.5" />`;
+
+  // Grid
+  for(let t=-1.2; t<=1.2; t+=0.4) {
+      const g1a = add(scaleVec(vx1, t), scaleVec(vx2, -1.2));
+      const g1b = add(scaleVec(vx1, t), scaleVec(vx2, 1.2));
+      h += `<path d="M${d3pt(g1a, az,el,cx,cy,s)} L${d3pt(g1b, az,el,cx,cy,s)}" stroke="${COLORS.grid}" stroke-width="0.5" fill="none" />`;
+      const g2a = add(scaleVec(vx1, -1.2), scaleVec(vx2, t));
+      const g2b = add(scaleVec(vx1, 1.2), scaleVec(vx2, t));
+      h += `<path d="M${d3pt(g2a, az,el,cx,cy,s)} L${d3pt(g2b, az,el,cx,cy,s)}" stroke="${COLORS.grid}" stroke-width="0.5" fill="none" />`;
+  }
+
+  const p0 = d3pt([0,0,0], az, el, cx, cy, s);
+  
+  // Projection drop line
+  const py = d3pt(y, az, el, cx, cy, s);
+  const pyh_shadow = d3pt(fit.yhat, az, el, cx, cy, s);
+  h += `<path d="M${pyh_shadow} L${py}" stroke="${COLORS.axisLabel}" stroke-width="0.8" stroke-dasharray="2 2" fill="none" opacity="0.6" />`;
+
+  // Vectors
+  h += `<path d="M${p0} L${d3pt(vx1, az,el,cx,cy,s)}" stroke="${COLORS.x1}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  h += `<path d="M${p0} L${d3pt(vx2, az,el,cx,cy,s)}" stroke="${COLORS.x2}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  h += `<path d="M${p0} L${py}" stroke="${COLORS.y}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+  
+  const pyh = d3pt(fit.yhat, az,el,cx,cy,s);
+  h += `<path d="M${p0} L${pyh}" stroke="${COLORS.yhat}" stroke-width="2.5" marker-end="url(#arrow)" fill="none" />`;
+
+  // Residual
+  h += `<path d="M${pyh} L${py}" stroke="${COLORS.residual}" stroke-width="2" stroke-dasharray="6 4" fill="none" />`;
+
+  // Right angle marker
+  if(norm(fit.residuals) > 0.1) {
+    const e_dir = normalize(fit.residuals);
+    const yh_dir = normalize(fit.yhat);
+    const armSize = 0.8;
+    const arm1 = add(fit.yhat, scaleVec(e_dir, armSize));
+    const arm2 = add(arm1, scaleVec(yh_dir, -armSize));
+    const arm3 = add(fit.yhat, scaleVec(yh_dir, -armSize));
+    h += `<polyline points="${pyh} ${d3pt(arm1, az,el,cx,cy,s)} ${d3pt(arm2, az,el,cx,cy,s)} ${d3pt(arm3, az,el,cx,cy,s)}" stroke="${COLORS.residual}" stroke-width="1.5" fill="none" />`;
+  }
+
+  // Labels
+  const lx1 = project3D(vx1[0]*1.1, vx1[1]*1.1, vx1[2]*1.1, az, el, cx, cy, s);
+  h += `<text x="${lx1[0]}" y="${lx1[1]}" fill="${COLORS.x1}" font-size="12px" font-weight="bold">x₁</text>`;
+  const lx2 = project3D(vx2[0]*1.1, vx2[1]*1.1, vx2[2]*1.1, az, el, cx, cy, s);
+  h += `<text x="${lx2[0]}" y="${lx2[1]}" fill="${COLORS.x2}" font-size="12px" font-weight="bold">x₂</text>`;
+  const ly = project3D(y[0], y[1], y[2], az, el, cx, cy, s);
+  h += `<text x="${ly[0]+8}" y="${ly[1]-8}" fill="${COLORS.y}" font-size="13px" font-weight="bold">y</text>`;
+  const lyh_lbl = project3D(fit.yhat[0]*1.05, fit.yhat[1]*1.05, fit.yhat[2]*1.05, az, el, cx, cy, s);
+  h += `<text x="${lyh_lbl[0]+8}" y="${lyh_lbl[1]+12}" fill="${COLORS.yhat}" font-size="13px" font-weight="bold">ŷ = Hy</text>`;
+  const le = project3D((y[0]+fit.yhat[0])/2, (y[1]+fit.yhat[1])/2, (y[2]+fit.yhat[2])/2, az,el,cx,cy,s);
+  h += `<text x="${le[0]+12}" y="${le[1]}" fill="${COLORS.residual}" font-size="13px" font-weight="bold">e = y - ŷ</text>`;
+
+  h += `<circle cx="${p0.split(',')[0]}" cy="${p0.split(',')[1]}" r="3" fill="${COLORS.text}" />`;
+  svg.innerHTML = h;
+
+  // Matrices
+  const H = fit.hatMatrix;
+  document.getElementById('matrix-h').innerHTML = formatMatrix(H);
+  document.getElementById('matrix-h2').innerHTML = formatMatrix(matMul(H, H));
+  const trH = H[0][0] + H[1][1] + H[2][2];
+  document.getElementById('tr-h').innerHTML = `tr(H) = ${H[0][0].toFixed(3)} + ${H[1][1].toFixed(3)} + ${H[2][2].toFixed(3)} = <strong>${trH.toFixed(1)}</strong>`;
+}
+
+['rot2', 'tlt2', 'move-y'].forEach(id => {
+    document.getElementById(id).addEventListener('input', drawSection2);
+});
+
+// ==== Drag Wiring ====
+function attachDrag(svgId, rotId, tltId, renderFn) {
+  const svgEl = document.getElementById(svgId);
+  let dragging = false, lastX, lastY;
+  
+  function start(e) {
+    dragging = true;
+    const pt = e.touches ? e.touches[0] : e;
+    lastX = pt.clientX; lastY = pt.clientY;
+    e.preventDefault();
+  }
+
+  function move(e) {
+    if (!dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    const dx = pt.clientX - lastX;
+    const dy = pt.clientY - lastY;
+    lastX = pt.clientX; lastY = pt.clientY;
+    
+    const rot = document.getElementById(rotId);
+    const tlt = document.getElementById(tltId);
+    let nrot = (parseFloat(rot.value) + dx * 0.5) % 360;
+    if(nrot < 0) nrot+=360;
+    let ntlt = Math.min(85, Math.max(5, parseFloat(tlt.value) + dy * 0.5));
+    rot.value = nrot;
+    tlt.value = ntlt;
+    renderFn();
+    e.preventDefault();
+  }
+
+  function end() { dragging = false; }
+
+  svgEl.addEventListener('mousedown', start);
+  svgEl.addEventListener('mousemove', move);
+  svgEl.addEventListener('mouseup', end);
+  svgEl.addEventListener('mouseleave', end);
+  svgEl.addEventListener('touchstart', start, { passive: false });
+  svgEl.addEventListener('touchmove', move, { passive: false });
+  svgEl.addEventListener('touchend', end);
+}
+
+attachDrag('svg1', 'rot1', 'tlt1', drawSection1);
+attachDrag('svg2', 'rot2', 'tlt2', drawSection2);
+
+// Init
+drawSection1();
+drawSection2();
+</script>
+
+<!-- STANDALONE MODE CLOSE
+</body>
+</html>
+-->
