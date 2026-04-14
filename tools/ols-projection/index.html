@@ -38,11 +38,6 @@ mathjax: false
     font-weight: 700; color: #8a959e; text-transform: uppercase;
     letter-spacing: 0.6px; margin-bottom: 14px;
 }
-.fixed-info {
-    font-family: 'Monaco', 'Consolas', monospace; font-size: 0.82em;
-    color: #6b7b8a; padding-bottom: 10px; margin-bottom: 14px;
-    border-bottom: 1px solid #e4e9ed; line-height: 1.6;
-}
 .control-group { margin-bottom: 16px; }
 .control-group:last-child { margin-bottom: 0; }
 .control-label {
@@ -224,7 +219,7 @@ mathjax: false
 
     <div class="vector-notation">
         <div class="vec-block">
-            <span class="vec-eq">$x = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}$</span>
+            <span class="vec-eq" id="vec-x-display">$x = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}$</span>
         </div>
         <div class="vec-block">
             <span class="vec-eq" id="vec-y-display">$y = \begin{pmatrix} 2 \\ 5 \\ 4 \end{pmatrix}$</span>
@@ -235,8 +230,32 @@ mathjax: false
     <div class="calc-layout">
         <div class="calc-left">
             <div class="controls-panel">
-                <div class="panel-title">Response Vector</div>
-                <div class="fixed-info">$x = (1, 2, 3)$ <span style="color:#aab4bc">&mdash; fixed</span></div>
+                <div class="panel-title">Predictor Vector x</div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2081;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x1" min="-8" max="8" value="1" step="0.5">
+                        <input type="number" class="control-num" id="n-x1" value="1" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2082;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x2" min="-8" max="8" value="2" step="0.5">
+                        <input type="number" class="control-num" id="n-x2" value="2" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2083;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x3" min="-8" max="8" value="3" step="0.5">
+                        <input type="number" class="control-num" id="n-x3" value="3" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="panel-title">Response Vector y</div>
                 <div class="control-group">
                     <label class="control-label">y&#x2081;</label>
                     <div class="control-input-row">
@@ -274,6 +293,13 @@ mathjax: false
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="tlt1" min="5" max="85" value="28" step="1">
                         <input type="number" class="control-num" id="tlt1-num" value="28" min="5" max="85" step="1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Roll</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="roll1" min="-180" max="180" value="0" step="1">
+                        <input type="number" class="control-num" id="roll1-num" value="0" min="-180" max="180" step="1">
                     </div>
                 </div>
             </div>
@@ -336,24 +362,87 @@ mathjax: false
 
     <div class="vector-notation">
         <div class="vec-block">
-            <span class="vec-eq">$X = \begin{pmatrix} x_1 & x_2 \end{pmatrix} = \begin{pmatrix} 3 & -1 \\ 1 & 2 \\ 2 & 3 \end{pmatrix}$</span>
+            <span class="vec-eq" id="vec-X-display">$X = \begin{pmatrix} 3 & -1 \\ 1 & 2 \\ 2 & 3 \end{pmatrix}$</span>
         </div>
         <div class="vec-block">
-            <span class="vec-eq" id="vec-y2-display">$y = \begin{pmatrix} 1.5 \\ -0.2 \\ 7.3 \end{pmatrix}$</span>
+            <span class="vec-eq" id="vec-y2-display">$y = \begin{pmatrix} 2 \\ 5 \\ 4 \end{pmatrix}$</span>
         </div>
-        <div class="vec-note">$X$ is now $n \times p$ with $n = 3$ observations and $p = 2$ predictors. Each column of $X$ is a vector in $\mathbb{R}^n$. Together they span a <strong>2D plane</strong> &mdash; the column space $\text{Col}(X)$.</div>
+        <div class="vec-note">$X$ is $n \times p$ with $n = 3$ observations and $p = 2$ predictors. Each column of $X$ is a vector in $\mathbb{R}^n$. Together they span a <strong>2D plane</strong> &mdash; the column space $\text{Col}(X)$.</div>
     </div>
 
     <div class="calc-layout">
         <div class="calc-left">
             <div class="controls-panel">
-                <div class="panel-title">Predictors</div>
-                <div class="fixed-info">$x_1 = (3, 1, 2)$<br>$x_2 = (-1, 2, 3)$ <span style="color:#aab4bc">&mdash; fixed</span></div>
+                <div class="panel-title">Predictor x&#x2081;</div>
                 <div class="control-group">
-                    <label class="control-label">Off-plane noise</label>
+                    <label class="control-label">x&#x2081;&#x2081;</label>
                     <div class="control-input-row">
-                        <input type="range" class="control-slider" id="move-y" min="-15" max="15" value="4" step="0.5">
-                        <input type="number" class="control-num" id="move-y-num" value="4" min="-15" max="15" step="0.5">
+                        <input type="range" class="control-slider" id="s-x11" min="-8" max="8" value="3" step="0.5">
+                        <input type="number" class="control-num" id="n-x11" value="3" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2081;&#x2082;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x12" min="-8" max="8" value="1" step="0.5">
+                        <input type="number" class="control-num" id="n-x12" value="1" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2081;&#x2083;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x13" min="-8" max="8" value="2" step="0.5">
+                        <input type="number" class="control-num" id="n-x13" value="2" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="panel-title">Predictor x&#x2082;</div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2082;&#x2081;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x21" min="-8" max="8" value="-1" step="0.5">
+                        <input type="number" class="control-num" id="n-x21" value="-1" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2082;&#x2082;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x22" min="-8" max="8" value="2" step="0.5">
+                        <input type="number" class="control-num" id="n-x22" value="2" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">x&#x2082;&#x2083;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-x23" min="-8" max="8" value="3" step="0.5">
+                        <input type="number" class="control-num" id="n-x23" value="3" step="0.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="panel-title">Response Vector y</div>
+                <div class="control-group">
+                    <label class="control-label">y&#x2081;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-y21" min="-8" max="8" value="2" step="0.5">
+                        <input type="number" class="control-num" id="n-y21" value="2" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">y&#x2082;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-y22" min="-8" max="8" value="5" step="0.5">
+                        <input type="number" class="control-num" id="n-y22" value="5" step="0.5">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">y&#x2083;</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="s-y23" min="-8" max="8" value="4" step="0.5">
+                        <input type="number" class="control-num" id="n-y23" value="4" step="0.5">
                     </div>
                 </div>
             </div>
@@ -372,6 +461,13 @@ mathjax: false
                     <div class="control-input-row">
                         <input type="range" class="control-slider" id="tlt2" min="5" max="85" value="25" step="1">
                         <input type="number" class="control-num" id="tlt2-num" value="25" min="5" max="85" step="1">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Roll</label>
+                    <div class="control-input-row">
+                        <input type="range" class="control-slider" id="roll2" min="-180" max="180" value="0" step="1">
+                        <input type="number" class="control-num" id="roll2-num" value="0" min="-180" max="180" step="1">
                     </div>
                 </div>
             </div>
@@ -460,8 +556,6 @@ mathjax: false
     function scl(v, s) { return v.map(function(x) { return x * s; }); }
     function nrm(v) { return Math.sqrt(dot(v, v)); }
     function unit(v) { var l = nrm(v); return l > 0 ? scl(v, 1/l) : v; }
-    function cross(a, b) { return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
-
     function transpose(A) {
         if (!A.length) return [];
         return A[0].map(function(_, c) { return A.map(function(r) { return r[c]; }); });
@@ -479,13 +573,17 @@ mathjax: false
     }
 
     /* ---- 3D projection ---- */
-    function proj3D(x, y, z, az, el, cx, cy, s) {
+    function proj3D(x, y, z, az, el, rl, cx, cy, s) {
         var ca = Math.cos(az), sa = Math.sin(az);
         var ce = Math.cos(el), se = Math.sin(el);
-        return [cx + (-x*sa + z*ca) * s, cy - (-x*ca*se - z*sa*se + y*ce) * s];
+        var sx = (-x*sa + z*ca) * s;
+        var sy = (-x*ca*se - z*sa*se + y*ce) * s;
+        /* apply roll */
+        var cr = Math.cos(rl), sr = Math.sin(rl);
+        return [cx + sx*cr - sy*sr, cy - (sx*sr + sy*cr)];
     }
-    function pt(v, az, el, cx, cy, s) {
-        var p = proj3D(v[0], v[1], v[2], az, el, cx, cy, s);
+    function pt(v, az, el, rl, cx, cy, s) {
+        var p = proj3D(v[0], v[1], v[2], az, el, rl, cx, cy, s);
         return p[0].toFixed(1) + ',' + p[1].toFixed(1);
     }
 
@@ -508,44 +606,39 @@ mathjax: false
         var yhat = X.map(function(row) { return dot(row, beta); });
         return { beta: beta, yhat: yhat, e: sub(y, yhat), H: matMul(matMul(X, XtX_inv), Xt) };
     }
-    function decompose(y, v1, v2) {
-        var n = unit(cross(v1, v2));
-        var off = dot(y, n);
-        return { on: sub(y, scl(n, off)), n: n };
-    }
-
     /* ---- SVG drawing ---- */
-    function drawAxes(az, el, cx, cy, s) {
+    /* cam = {az, el, rl, cx, cy, s} */
+    function drawAxes(cam) {
         var h = '', len = 6;
         var axes = [
             [[len,0,0],'obs 1'], [[-len,0,0],''],
             [[0,len,0],'obs 2'], [[0,-len,0],''],
             [[0,0,len],'obs 3'], [[0,0,-len],'']
         ];
-        var o = proj3D(0,0,0, az,el, cx,cy, s);
+        var o = proj3D(0,0,0, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
         for (var i = 0; i < axes.length; i++) {
-            var a = axes[i], e = proj3D(a[0][0],a[0][1],a[0][2], az,el, cx,cy, s);
+            var a = axes[i], e = proj3D(a[0][0],a[0][1],a[0][2], cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
             h += '<path d="M'+o[0]+','+o[1]+' L'+e[0]+','+e[1]+'" stroke="'+C.axis+'" stroke-dasharray="4 3" stroke-width="0.8" fill="none"/>';
             if (a[1]) {
-                var l = proj3D(a[0][0]*1.15, a[0][1]*1.15, a[0][2]*1.15, az,el, cx,cy, s);
+                var l = proj3D(a[0][0]*1.15, a[0][1]*1.15, a[0][2]*1.15, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
                 h += '<text x="'+l[0]+'" y="'+l[1]+'" fill="'+C.axisLabel+'" font-size="11" font-family="Helvetica,Arial,sans-serif" text-anchor="middle" dominant-baseline="middle">'+a[1]+'</text>';
             }
         }
         return h;
     }
-    function arrow(from, to, color, az, el, cx, cy, s, w) {
-        return '<path d="M'+pt(from,az,el,cx,cy,s)+' L'+pt(to,az,el,cx,cy,s)+'" stroke="'+color+'" stroke-width="'+(w||2.5)+'" marker-end="url(#vec-arrow)" fill="none"/>';
+    function arw(from, to, color, cam, w) {
+        return '<path d="M'+pt(from,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(to,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+color+'" stroke-width="'+(w||2.5)+'" marker-end="url(#vec-arrow)" fill="none"/>';
     }
-    function lbl(v, text, color, az, el, cx, cy, s, dx, dy) {
-        var p = proj3D(v[0], v[1], v[2], az, el, cx, cy, s);
+    function lbl(v, text, color, cam, dx, dy) {
+        var p = proj3D(v[0], v[1], v[2], cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
         return '<text x="'+(p[0]+(dx||0))+'" y="'+(p[1]+(dy||0))+'" fill="'+color+'" font-size="13" font-family="Helvetica,Arial,sans-serif" font-weight="600">'+text+'</text>';
     }
-    function rightAngle(yhat, edir, bdir, az, el, cx, cy, s, sz) {
+    function rightAngle(yhat, edir, bdir, cam, sz) {
         sz = sz || 0.6;
         var a1 = add(yhat, scl(edir, sz));
         var a2 = add(a1, scl(bdir, -sz));
         var a3 = add(yhat, scl(bdir, -sz));
-        return '<polyline points="'+pt(yhat,az,el,cx,cy,s)+' '+pt(a1,az,el,cx,cy,s)+' '+pt(a2,az,el,cx,cy,s)+' '+pt(a3,az,el,cx,cy,s)+'" stroke="'+C.residual+'" stroke-width="1.5" fill="none" opacity="0.5"/>';
+        return '<polyline points="'+pt(yhat,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' '+pt(a1,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' '+pt(a2,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' '+pt(a3,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.residual+'" stroke-width="1.5" fill="none" opacity="0.5"/>';
     }
 
     /* ---- Slider+number sync ---- */
@@ -559,24 +652,35 @@ mathjax: false
     }
 
     /* ==== Section 1 ==== */
-    var x1Vec = [1, 2, 3];
+    function readVec(id1, id2, id3) {
+        return [parseFloat(document.getElementById(id1).value),
+                parseFloat(document.getElementById(id2).value),
+                parseFloat(document.getElementById(id3).value)];
+    }
+
+    function renderVecKatex(elId, name, v) {
+        var el = document.getElementById(elId);
+        if (typeof katex !== 'undefined') {
+            katex.render(name + ' = \\begin{pmatrix} ' + v[0] + ' \\\\ ' + v[1] + ' \\\\ ' + v[2] + ' \\end{pmatrix}', el, { throwOnError: false });
+        }
+    }
 
     function drawS1() {
-        var az = document.getElementById('rot1').value * Math.PI / 180;
-        var el = document.getElementById('tlt1').value * Math.PI / 180;
+        var cam = {
+            az: document.getElementById('rot1').value * Math.PI / 180,
+            el: document.getElementById('tlt1').value * Math.PI / 180,
+            rl: document.getElementById('roll1').value * Math.PI / 180,
+            cx: 340, cy: 250, s: 25
+        };
         var svg = document.getElementById('svg1');
-        var cx = 340, cy = 250, s = 25;
-        var y = [parseFloat(document.getElementById('s-y1').value),
-                 parseFloat(document.getElementById('s-y2').value),
-                 parseFloat(document.getElementById('s-y3').value)];
+        var x1Vec = readVec('s-x1', 's-x2', 's-x3');
+        var y = readVec('s-y1', 's-y2', 's-y3');
 
         var fit = olsLine(x1Vec, y);
 
-        /* Vector notation display */
-        var vecEl = document.getElementById('vec-y-display');
-        if (typeof katex !== 'undefined') {
-            katex.render('y = \\begin{pmatrix} ' + y[0] + ' \\\\ ' + y[1] + ' \\\\ ' + y[2] + ' \\end{pmatrix}', vecEl, { throwOnError: false });
-        }
+        /* Vector notation displays */
+        renderVecKatex('vec-x-display', 'x', x1Vec);
+        renderVecKatex('vec-y-display', 'y', y);
 
         /* Result cards */
         document.getElementById('val-beta').textContent = fit.beta.toFixed(3);
@@ -601,51 +705,53 @@ mathjax: false
         document.getElementById('chk-pyth').innerHTML = Math.abs(ny2 - nyh2 - ne2) < 0.01 ? '<span class="check-ok">&#10003;</span>' : '<span class="check-err">&#10007;</span>';
 
         /* SVG */
-        var h = drawAxes(az, el, cx, cy, s);
+        var h = drawAxes(cam);
         var O = [0,0,0];
 
         /* Column space line */
         var far = scl(x1Vec, 2.5), near = scl(x1Vec, -2.5);
-        h += '<path d="M'+pt(near,az,el,cx,cy,s)+' L'+pt(far,az,el,cx,cy,s)+'" stroke="'+C.x1+'" stroke-width="1.5" opacity="0.25" fill="none"/>';
+        h += '<path d="M'+pt(near,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(far,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.x1+'" stroke-width="1.5" opacity="0.25" fill="none"/>';
         for (var t = -2.5; t <= 2.5; t += 0.3) {
-            var dp = scl(x1Vec, t), pp = proj3D(dp[0],dp[1],dp[2], az,el, cx,cy, s);
+            var dp = scl(x1Vec, t), pp = proj3D(dp[0],dp[1],dp[2], cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
             h += '<circle cx="'+pp[0]+'" cy="'+pp[1]+'" r="1.5" fill="'+C.x1+'" opacity="0.25"/>';
         }
 
         /* Vectors */
-        h += arrow(O, x1Vec, C.x1, az,el,cx,cy,s);
-        h += lbl(x1Vec, 'x', C.x1, az,el,cx,cy,s, 12, -8);
+        h += arw(O, x1Vec, C.x1, cam);
+        h += lbl(x1Vec, 'x', C.x1, cam, 12, -8);
 
-        h += arrow(O, y, C.y, az,el,cx,cy,s);
-        h += lbl(y, 'y', C.y, az,el,cx,cy,s, 8, -10);
+        h += arw(O, y, C.y, cam);
+        h += lbl(y, 'y', C.y, cam, 8, -10);
 
-        h += arrow(O, fit.yhat, C.yhat, az,el,cx,cy,s);
-        h += lbl(fit.yhat, '\u0177', C.yhat, az,el,cx,cy,s, 12, 14);
+        h += arw(O, fit.yhat, C.yhat, cam);
+        h += lbl(fit.yhat, '\u0177', C.yhat, cam, 12, 14);
 
         /* Residual */
-        h += '<path d="M'+pt(fit.yhat,az,el,cx,cy,s)+' L'+pt(y,az,el,cx,cy,s)+'" stroke="'+C.residual+'" stroke-width="2" stroke-dasharray="6 4" fill="none"/>';
+        h += '<path d="M'+pt(fit.yhat,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(y,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.residual+'" stroke-width="2" stroke-dasharray="6 4" fill="none"/>';
         var eMid = [(y[0]+fit.yhat[0])/2, (y[1]+fit.yhat[1])/2, (y[2]+fit.yhat[2])/2];
-        h += lbl(eMid, 'e', C.residual, az,el,cx,cy,s, 14, 0);
+        h += lbl(eMid, 'e', C.residual, cam, 14, 0);
 
         /* Right angle (skip when residual near zero) */
         if (nrm(fit.e) > 0.1)
-            h += rightAngle(fit.yhat, unit(fit.e), unit(fit.yhat), az,el,cx,cy,s);
+            h += rightAngle(fit.yhat, unit(fit.e), unit(fit.yhat), cam);
 
         /* Origin dot */
-        var op = proj3D(0,0,0, az,el, cx,cy, s);
+        var op = proj3D(0,0,0, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
         h += '<circle cx="'+op[0]+'" cy="'+op[1]+'" r="3" fill="'+C.dot+'"/>';
         svg.innerHTML = h;
     }
 
+    sync('s-x1', 'n-x1', drawS1);
+    sync('s-x2', 'n-x2', drawS1);
+    sync('s-x3', 'n-x3', drawS1);
     sync('s-y1', 'n-y1', drawS1);
     sync('s-y2', 'n-y2', drawS1);
     sync('s-y3', 'n-y3', drawS1);
     sync('rot1', 'rot1-num', drawS1);
     sync('tlt1', 'tlt1-num', drawS1);
+    sync('roll1', 'roll1-num', drawS1);
 
     /* ==== Section 2 ==== */
-    var vx1 = [3,1,2], vx2 = [-1,2,3];
-    var dec = decompose([2,5,4], vx1, vx2);
 
     function fmtMat(m) {
         var h = '';
@@ -656,20 +762,25 @@ mathjax: false
     }
 
     function drawS2() {
-        var az = document.getElementById('rot2').value * Math.PI / 180;
-        var el = document.getElementById('tlt2').value * Math.PI / 180;
-        var off = parseFloat(document.getElementById('move-y').value);
-        var y = add(dec.on, scl(dec.n, off));
+        var cam = {
+            az: document.getElementById('rot2').value * Math.PI / 180,
+            el: document.getElementById('tlt2').value * Math.PI / 180,
+            rl: document.getElementById('roll2').value * Math.PI / 180,
+            cx: 340, cy: 260, s: 25
+        };
         var svg = document.getElementById('svg2');
-        var cx = 340, cy = 260, s = 25;
+        var vx1 = readVec('s-x11', 's-x12', 's-x13');
+        var vx2 = readVec('s-x21', 's-x22', 's-x23');
+        var y = readVec('s-y21', 's-y22', 's-y23');
 
         var fit = olsPlane([vx1, vx2], y);
 
-        /* Vector notation display */
-        var vecEl2 = document.getElementById('vec-y2-display');
+        /* Vector notation displays */
+        var xEl = document.getElementById('vec-X-display');
         if (typeof katex !== 'undefined') {
-            katex.render('y = \\begin{pmatrix} ' + y[0].toFixed(1) + ' \\\\ ' + y[1].toFixed(1) + ' \\\\ ' + y[2].toFixed(1) + ' \\end{pmatrix}', vecEl2, { throwOnError: false });
+            katex.render('X = \\begin{pmatrix} ' + vx1[0] + ' & ' + vx2[0] + ' \\\\ ' + vx1[1] + ' & ' + vx2[1] + ' \\\\ ' + vx1[2] + ' & ' + vx2[2] + ' \\end{pmatrix}', xEl, { throwOnError: false });
         }
+        renderVecKatex('vec-y2-display', 'y', y);
 
         /* Result cards */
         document.getElementById('val-b1').textContent = fit.beta[0].toFixed(3);
@@ -686,7 +797,7 @@ mathjax: false
             ' = <strong>' + trH.toFixed(1) + '</strong>';
 
         /* SVG */
-        var h = drawAxes(az, el, cx, cy, s);
+        var h = drawAxes(cam);
         var O = [0,0,0];
 
         /* Plane */
@@ -696,51 +807,56 @@ mathjax: false
             add(scl(vx1,-1.2), scl(vx2,-1.2)),
             add(scl(vx1,-1.2), scl(vx2,1.2))
         ];
-        h += '<polygon points="'+corners.map(function(c){ return pt(c,az,el,cx,cy,s); }).join(' ')+'" fill="'+C.plane+'" stroke="'+C.planeStroke+'" stroke-width="0.5"/>';
+        h += '<polygon points="'+corners.map(function(c){ return pt(c,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s); }).join(' ')+'" fill="'+C.plane+'" stroke="'+C.planeStroke+'" stroke-width="0.5"/>';
 
         /* Grid lines */
         for (var t = -1.2; t <= 1.2; t += 0.4) {
-            h += '<path d="M'+pt(add(scl(vx1,t),scl(vx2,-1.2)),az,el,cx,cy,s)+' L'+pt(add(scl(vx1,t),scl(vx2,1.2)),az,el,cx,cy,s)+'" stroke="'+C.grid+'" stroke-width="0.5" fill="none"/>';
-            h += '<path d="M'+pt(add(scl(vx1,-1.2),scl(vx2,t)),az,el,cx,cy,s)+' L'+pt(add(scl(vx1,1.2),scl(vx2,t)),az,el,cx,cy,s)+'" stroke="'+C.grid+'" stroke-width="0.5" fill="none"/>';
+            h += '<path d="M'+pt(add(scl(vx1,t),scl(vx2,-1.2)),cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(add(scl(vx1,t),scl(vx2,1.2)),cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.grid+'" stroke-width="0.5" fill="none"/>';
+            h += '<path d="M'+pt(add(scl(vx1,-1.2),scl(vx2,t)),cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(add(scl(vx1,1.2),scl(vx2,t)),cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.grid+'" stroke-width="0.5" fill="none"/>';
         }
 
         /* Vectors */
-        h += arrow(O, vx1, C.x1, az,el,cx,cy,s);
-        h += arrow(O, vx2, C.x2, az,el,cx,cy,s);
-        h += arrow(O, y, C.y, az,el,cx,cy,s);
-        h += arrow(O, fit.yhat, C.yhat, az,el,cx,cy,s);
+        h += arw(O, vx1, C.x1, cam);
+        h += arw(O, vx2, C.x2, cam);
+        h += arw(O, y, C.y, cam);
+        h += arw(O, fit.yhat, C.yhat, cam);
 
         /* Residual */
-        h += '<path d="M'+pt(fit.yhat,az,el,cx,cy,s)+' L'+pt(y,az,el,cx,cy,s)+'" stroke="'+C.residual+'" stroke-width="2" stroke-dasharray="6 4" fill="none"/>';
+        h += '<path d="M'+pt(fit.yhat,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+' L'+pt(y,cam.az,cam.el,cam.rl,cam.cx,cam.cy,cam.s)+'" stroke="'+C.residual+'" stroke-width="2" stroke-dasharray="6 4" fill="none"/>';
 
         /* Right angle */
         if (nrm(fit.e) > 0.1)
-            h += rightAngle(fit.yhat, unit(fit.e), unit(fit.yhat), az,el,cx,cy,s, 0.8);
+            h += rightAngle(fit.yhat, unit(fit.e), unit(fit.yhat), cam, 0.8);
 
         /* Labels */
-        h += lbl(scl(vx1,1.1), 'x\u2081', C.x1, az,el,cx,cy,s, 0, 0);
-        h += lbl(scl(vx2,1.1), 'x\u2082', C.x2, az,el,cx,cy,s, 0, 0);
-        h += lbl(y, 'y', C.y, az,el,cx,cy,s, 8, -10);
-        h += lbl(scl(fit.yhat,1.05), '\u0177', C.yhat, az,el,cx,cy,s, 8, 14);
+        h += lbl(scl(vx1,1.1), 'x\u2081', C.x1, cam, 0, 0);
+        h += lbl(scl(vx2,1.1), 'x\u2082', C.x2, cam, 0, 0);
+        h += lbl(y, 'y', C.y, cam, 8, -10);
+        h += lbl(scl(fit.yhat,1.05), '\u0177', C.yhat, cam, 8, 14);
         var eMid = [(y[0]+fit.yhat[0])/2, (y[1]+fit.yhat[1])/2, (y[2]+fit.yhat[2])/2];
-        h += lbl(eMid, 'e', C.residual, az,el,cx,cy,s, 12, 0);
+        h += lbl(eMid, 'e', C.residual, cam, 12, 0);
 
         /* Origin dot */
-        var op = proj3D(0,0,0, az,el, cx,cy, s);
+        var op = proj3D(0,0,0, cam.az,cam.el,cam.rl, cam.cx,cam.cy, cam.s);
         h += '<circle cx="'+op[0]+'" cy="'+op[1]+'" r="3" fill="'+C.dot+'"/>';
         svg.innerHTML = h;
     }
 
-    sync('move-y', 'move-y-num', drawS2);
+    sync('s-x11', 'n-x11', drawS2); sync('s-x12', 'n-x12', drawS2); sync('s-x13', 'n-x13', drawS2);
+    sync('s-x21', 'n-x21', drawS2); sync('s-x22', 'n-x22', drawS2); sync('s-x23', 'n-x23', drawS2);
+    sync('s-y21', 'n-y21', drawS2); sync('s-y22', 'n-y22', drawS2); sync('s-y23', 'n-y23', drawS2);
     sync('rot2', 'rot2-num', drawS2);
     sync('tlt2', 'tlt2-num', drawS2);
+    sync('roll2', 'roll2-num', drawS2);
 
     /* ==== Drag rotation ==== */
-    function attachDrag(svgId, rId, rnId, tId, tnId, fn) {
+    /* Left-drag: rotation + tilt.  Shift-drag (or right-drag): roll. */
+    function attachDrag(svgId, rId, rnId, tId, tnId, rlId, rlnId, fn) {
         var el = document.getElementById(svgId);
-        var drag = false, lx, ly;
+        var drag = false, lx, ly, shift = false;
         function start(e) {
             drag = true;
+            shift = e.shiftKey || e.button === 2;
             var p = e.touches ? e.touches[0] : e;
             lx = p.clientX; ly = p.clientY;
             e.preventDefault();
@@ -750,17 +866,27 @@ mathjax: false
             var p = e.touches ? e.touches[0] : e;
             var dx = p.clientX - lx, dy = p.clientY - ly;
             lx = p.clientX; ly = p.clientY;
-            var r = document.getElementById(rId), t = document.getElementById(tId);
-            var nr = (parseFloat(r.value) + dx * 0.5) % 360;
-            if (nr < 0) nr += 360;
-            var nt = Math.min(85, Math.max(5, parseFloat(t.value) + dy * 0.5));
-            r.value = nr; t.value = nt;
-            document.getElementById(rnId).value = Math.round(nr);
-            document.getElementById(tnId).value = Math.round(nt);
+            if (shift || e.shiftKey) {
+                /* Roll */
+                var rl = document.getElementById(rlId);
+                var nrl = Math.min(180, Math.max(-180, parseFloat(rl.value) + dx * 0.5));
+                rl.value = nrl;
+                document.getElementById(rlnId).value = Math.round(nrl);
+            } else {
+                /* Rotation + Tilt */
+                var r = document.getElementById(rId), t = document.getElementById(tId);
+                var nr = (parseFloat(r.value) + dx * 0.5) % 360;
+                if (nr < 0) nr += 360;
+                var nt = Math.min(85, Math.max(5, parseFloat(t.value) + dy * 0.5));
+                r.value = nr; t.value = nt;
+                document.getElementById(rnId).value = Math.round(nr);
+                document.getElementById(tnId).value = Math.round(nt);
+            }
             fn();
             e.preventDefault();
         }
         function end() { drag = false; }
+        el.addEventListener('contextmenu', function(e) { e.preventDefault(); });
         el.addEventListener('mousedown', start);
         el.addEventListener('mousemove', move);
         el.addEventListener('mouseup', end);
@@ -770,8 +896,8 @@ mathjax: false
         el.addEventListener('touchend', end);
     }
 
-    attachDrag('svg1', 'rot1', 'rot1-num', 'tlt1', 'tlt1-num', drawS1);
-    attachDrag('svg2', 'rot2', 'rot2-num', 'tlt2', 'tlt2-num', drawS2);
+    attachDrag('svg1', 'rot1', 'rot1-num', 'tlt1', 'tlt1-num', 'roll1', 'roll1-num', drawS1);
+    attachDrag('svg2', 'rot2', 'rot2-num', 'tlt2', 'tlt2-num', 'roll2', 'roll2-num', drawS2);
 
     /* Init */
     drawS1();
