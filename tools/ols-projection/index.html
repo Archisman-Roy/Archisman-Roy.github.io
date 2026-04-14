@@ -169,6 +169,23 @@ mathjax: false
 }
 .trace-line strong { color: #2c3e50; }
 
+/* Vector notation block */
+.vector-notation {
+    display: flex; align-items: center; gap: 32px; flex-wrap: wrap;
+    background: #fff; border-radius: 10px; border: 1px solid #e4e9ed;
+    padding: 20px 24px; margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.vector-notation .vec-block {
+    display: flex; align-items: center; gap: 10px;
+}
+.vector-notation .vec-eq { color: #2c3e50; font-size: 1.1em; }
+.vector-notation .vec-note {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.82em;
+    color: #8a959e; line-height: 1.5; flex: 1; min-width: 180px;
+}
+.vector-notation .vec-note strong { color: #2c3e50; }
+
 /* Note panel */
 .note-panel {
     margin-top: 16px; padding: 14px 18px; border-left: 3px solid #5dbcd2;
@@ -203,7 +220,17 @@ mathjax: false
 
     <!-- ===== Section 1 ===== -->
     <h2>One Predictor: Projection onto a Line</h2>
-    <p class="section-desc">With a single predictor $x = (1, 2, 3)$, the column space $\text{Col}(X)$ is a line through the origin. The fitted vector $\hat{y} = \hat{\beta} x$ is the point on this line closest to $y$.</p>
+    <p class="section-desc">With a single predictor, the column space $\text{Col}(X)$ is a line through the origin. The fitted vector $\hat{y} = \hat{\beta} x$ is the point on this line closest to $y$.</p>
+
+    <div class="vector-notation">
+        <div class="vec-block">
+            <span class="vec-eq">$x = \begin{pmatrix} 1 \\ 2 \\ 3 \end{pmatrix}$</span>
+        </div>
+        <div class="vec-block">
+            <span class="vec-eq" id="vec-y-display">$y = \begin{pmatrix} 2 \\ 5 \\ 4 \end{pmatrix}$</span>
+        </div>
+        <div class="vec-note">Both vectors live in $\mathbb{R}^n$ where $n = 3$ is the <strong>number of observations</strong>. Each coordinate axis represents one observation &mdash; not a variable.</div>
+    </div>
 
     <div class="calc-layout">
         <div class="calc-left">
@@ -306,6 +333,16 @@ mathjax: false
     <!-- ===== Section 2 ===== -->
     <h2>Two Predictors: Projection onto a Plane</h2>
     <p class="section-desc">Adding a second predictor expands the column space from a line to a 2D plane. The projection $\hat{y} = Hy$ is the closest point on this plane to $y$, where $H = X(X'X)^{-1}X'$ is the hat matrix.</p>
+
+    <div class="vector-notation">
+        <div class="vec-block">
+            <span class="vec-eq">$X = \begin{pmatrix} x_1 & x_2 \end{pmatrix} = \begin{pmatrix} 3 & -1 \\ 1 & 2 \\ 2 & 3 \end{pmatrix}$</span>
+        </div>
+        <div class="vec-block">
+            <span class="vec-eq" id="vec-y2-display">$y = \begin{pmatrix} 1.5 \\ -0.2 \\ 7.3 \end{pmatrix}$</span>
+        </div>
+        <div class="vec-note">$X$ is now $n \times p$ with $n = 3$ observations and $p = 2$ predictors. Each column of $X$ is a vector in $\mathbb{R}^n$. Together they span a <strong>2D plane</strong> &mdash; the column space $\text{Col}(X)$.</div>
+    </div>
 
     <div class="calc-layout">
         <div class="calc-left">
@@ -535,6 +572,12 @@ mathjax: false
 
         var fit = olsLine(x1Vec, y);
 
+        /* Vector notation display */
+        var vecEl = document.getElementById('vec-y-display');
+        if (typeof katex !== 'undefined') {
+            katex.render('y = \\begin{pmatrix} ' + y[0] + ' \\\\ ' + y[1] + ' \\\\ ' + y[2] + ' \\end{pmatrix}', vecEl, { throwOnError: false });
+        }
+
         /* Result cards */
         document.getElementById('val-beta').textContent = fit.beta.toFixed(3);
         var xteAbs = Math.abs(fit.xte);
@@ -621,6 +664,12 @@ mathjax: false
         var cx = 340, cy = 260, s = 25;
 
         var fit = olsPlane([vx1, vx2], y);
+
+        /* Vector notation display */
+        var vecEl2 = document.getElementById('vec-y2-display');
+        if (typeof katex !== 'undefined') {
+            katex.render('y = \\begin{pmatrix} ' + y[0].toFixed(1) + ' \\\\ ' + y[1].toFixed(1) + ' \\\\ ' + y[2].toFixed(1) + ' \\end{pmatrix}', vecEl2, { throwOnError: false });
+        }
 
         /* Result cards */
         document.getElementById('val-b1').textContent = fit.beta[0].toFixed(3);
