@@ -1,0 +1,1280 @@
+---
+layout: default
+title: "Producer Surplus — An Interactive Explainer"
+description: "Supply curves, producer surplus, and how it pairs with consumer surplus to measure the gains from trade"
+---
+
+<style>
+.ps { margin-bottom: 15px; }
+.ps p { font-size: 1em; color: #555; margin-bottom: 1em; line-height: 1.6; }
+.ps h1 { font-size: 2.2em; margin-bottom: 0.2em; }
+.ps h2 {
+    font-size: 1.4em; margin-top: 2.4em; margin-bottom: 0.4em;
+    color: #2c3e50;
+}
+.ps h2 .step {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.55em;
+    font-weight: 700; color: #8a959e; letter-spacing: 0.8px;
+    text-transform: uppercase; display: block; margin-bottom: 2px;
+}
+.section-desc { font-size: 0.95em; color: #6b7b8a; line-height: 1.6; }
+
+.chart-container {
+    background: #fff; border-radius: 12px; border: 1px solid #e4e9ed;
+    padding: 20px 16px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    margin-top: 18px;
+}
+.ps-svg { width: 100%; display: block; }
+
+.legend-bar {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 18px;
+    margin-top: 12px; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.78em; color: #6b7b8a;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 14px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.legend-swatch.dashed {
+    height: 2px; background: repeating-linear-gradient(
+        90deg, #d85a30 0px, #d85a30 4px, transparent 4px, transparent 7px
+    );
+}
+
+/* Controls panel (shared look with other tools) */
+.controls-panel {
+    background: #f7f9fb; border-radius: 10px; padding: 18px 20px;
+    margin-top: 16px; border: 1px solid #e4e9ed;
+}
+.panel-title {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.72em;
+    font-weight: 700; color: #8a959e; text-transform: uppercase;
+    letter-spacing: 0.6px; margin-bottom: 14px;
+}
+.control-group { margin-bottom: 0; }
+.control-label {
+    display: block; font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em; font-weight: 600; color: #555;
+    margin-bottom: 8px; letter-spacing: 0.2px;
+}
+.control-input-row { display: flex; align-items: center; gap: 12px; }
+.control-slider {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 8px; background: #e4e9ed; border-radius: 20px; outline: none;
+}
+.control-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+    background: #d85a30; border-radius: 50%; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.15s;
+}
+.control-slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+.control-slider::-moz-range-thumb {
+    width: 20px; height: 20px; background: #d85a30; border-radius: 50%;
+    cursor: pointer; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.control-num {
+    width: 72px; text-align: right; border: 1px solid #d5dbe0;
+    border-radius: 6px; padding: 5px 8px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.85em; font-weight: 600; color: #2c3e50; background: #fff;
+}
+.control-num:focus {
+    outline: none; border-color: #d85a30;
+    box-shadow: 0 0 0 2px rgba(216,90,48,0.2);
+}
+
+/* Stat cards */
+.stat-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px; margin-top: 14px;
+}
+.stat-card {
+    background: #fff; border-radius: 10px; padding: 12px 10px;
+    text-align: center; border: 2px solid #e4e9ed;
+}
+.stat-card.price { border-color: #d85a30; }
+.stat-card.sellers { border-color: #2D7D8F; }
+.stat-card.revenue { border-color: #0F6E56; }
+.stat-card.ps-surplus { border-color: #1E8FA8; }
+.stat-card.cs-surplus { border-color: #1D9E75; }
+.stat-card.dwl { border-color: #A32D2D; }
+.stat-label {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.66em;
+    color: #8a959e; text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 4px;
+}
+.stat-value {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.35em; font-weight: 700; color: #2c3e50;
+}
+.stat-card.price .stat-value { color: #d85a30; }
+.stat-card.sellers .stat-value { color: #2D7D8F; }
+.stat-card.revenue .stat-value { color: #0F6E56; }
+.stat-card.ps-surplus .stat-value { color: #1E8FA8; }
+.stat-card.cs-surplus .stat-value { color: #1D9E75; }
+.stat-card.dwl .stat-value { color: #A32D2D; }
+
+/* Toggle */
+.toggle-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; margin-top: 14px;
+    background: #eef1f4; padding: 4px; border-radius: 8px;
+    width: fit-content; margin-left: auto; margin-right: auto;
+}
+.toggle-btn {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.82em;
+    font-weight: 600; color: #6b7b8a; background: transparent;
+    border: none; padding: 7px 16px; border-radius: 6px; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.toggle-btn.active {
+    background: #fff; color: #2c3e50;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Market regime banner for Part 4 */
+.regime-note {
+    font-family: 'Helvetica', 'Arial', sans-serif; font-size: 0.85em;
+    color: #6b7b8a; text-align: center; margin-top: 10px;
+    padding: 8px 12px; border-radius: 6px; background: #f7f9fb;
+    border: 1px solid #e4e9ed;
+}
+.regime-note strong { color: #2c3e50; }
+
+/* Tier example */
+.tier-examples {
+    display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 16px;
+}
+.tier-card {
+    background: #f7f9fb; border-radius: 10px; padding: 16px 20px;
+    border: 1px solid #e4e9ed;
+}
+.tier-card h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.1em; color: #2c3e50; margin: 0 0 6px 0;
+}
+.tier-card p { font-size: 0.93em; margin: 0; color: #555; }
+
+/* Compact roster shown alongside Part 1 */
+.roster {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px 12px;
+    margin-top: 14px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.78em;
+}
+.roster-item { display: flex; justify-content: space-between; color: #6b7b8a; }
+.roster-item strong { color: #2c3e50; font-weight: 600; }
+@media (max-width: 720px) { .roster { grid-template-columns: repeat(2, 1fr); } }
+
+@media (max-width: 600px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+
+<div class="ps">
+
+<h1>Producer Surplus</h1>
+<p class="section-desc">
+The mirror image of <a href="/tools/consumer-surplus/">consumer surplus</a>.
+Same triangle, flipped upside-down. We'll start with ten freelance
+developers, build up to a supply curve, and end by laying supply and
+demand on the same axes &mdash; where the market's total gains from trade
+live.
+</p>
+
+<!-- ============================================================ -->
+<!-- PART 1 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 1</span>The supply problem</h2>
+<p>
+You need a SaaS MVP built. Ten freelance developers responded to your
+posting, and each has a different <strong>willingness to accept</strong>
+(WTA) &mdash; the minimum monthly rate they'd take before walking away.
+A principal engineer moonlighting has a high opportunity cost; a bootcamp
+grad looking for a portfolio piece will take almost anything.
+</p>
+<p>
+Here's the cast, ranked from lowest WTA to highest. The supply side is
+conventionally drawn this way &mdash; cheapest units first &mdash; because
+that's the order in which sellers enter the market as price rises.
+</p>
+
+<div class="chart-container">
+    <svg id="chart1" class="ps-svg" viewBox="0 0 600 340"
+         role="img" aria-labelledby="chart1-title chart1-desc">
+        <title id="chart1-title">Willingness to accept for ten freelance developers</title>
+        <desc id="chart1-desc">Bar chart of ten devs ranked by WTA from $3 up to $45.</desc>
+    </svg>
+    <div class="roster" id="roster" aria-label="Who's who"></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 2 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 2</span>Set the market price</h2>
+<p>
+Pick a single price that everyone is offered. Developers whose WTA sits
+<em>below</em> the price line <strong>supply</strong>; those above it
+stay home &mdash; the money's not worth their time. For every seller who
+supplies, the bar itself is their <span style="color:#555;font-weight:600;">
+cost</span> (what they needed to make the trade worth it), and the slice
+<em>above</em> the bar up to the price line is their
+<span style="color:#1E8FA8;font-weight:600;">producer surplus</span>
+&mdash; the extra they pocket over their reservation.
+</p>
+<p>
+Drag the slider. Lower prices leave cheap developers with big margins
+but shut out the high-cost ones. Higher prices pull more developers into
+the market but shrink everyone's PS per trade &mdash; wait, actually the
+opposite: <em>higher</em> prices grow PS per seller because the gap above
+their cost widens. (This is the first clue that producer surplus behaves
+like a mirror image of consumer surplus.)
+</p>
+
+<div class="controls-panel">
+    <div class="control-group" style="margin-bottom: 14px;">
+        <span class="control-label" style="margin-bottom: 8px;">Pricing strategy</span>
+        <div class="toggle-row" style="margin: 0;" role="tablist" aria-label="Pricing strategy">
+            <button class="toggle-btn active" id="strat-uniform"
+                    role="tab" aria-selected="true">Uniform price</button>
+            <button class="toggle-btn" id="strat-reverse"
+                    role="tab" aria-selected="false">Reverse auction</button>
+        </div>
+    </div>
+    <div class="control-group" id="slider-wrap">
+        <label class="control-label" for="price-slider">Price ($/month)</label>
+        <div class="control-input-row">
+            <input type="range" id="price-slider" class="control-slider"
+                   min="0" max="50" step="1" value="25"
+                   aria-label="Market price in dollars per month">
+            <input type="number" id="price-num" class="control-num"
+                   min="0" max="50" step="1" value="25">
+        </div>
+    </div>
+</div>
+
+<p style="margin-top: 1.2em;">
+Now flip to <strong>Reverse auction</strong>. Instead of one price for
+everyone, each developer is paid exactly their own WTA &mdash; imagine a
+procurement portal where the buyer sees every bid and pays only what each
+seller demanded. Every bar becomes pure <span style="color:#555;
+font-weight:600;">cost</span> &mdash; no teal slice above, because no
+seller got a margin. The buyer captured all the gains from trade. This is
+the mirror of personalized pricing from the consumer surplus page: whichever
+side runs the auction keeps the surplus.
+</p>
+
+<div class="chart-container">
+    <svg id="chart2" class="ps-svg" viewBox="0 0 600 340"
+         role="img" aria-labelledby="chart2-title chart2-desc">
+        <title id="chart2-title">Interactive supply chart</title>
+        <desc id="chart2-desc">Bars shaded to show suppliers, non-suppliers, and producer surplus at the chosen price.</desc>
+    </svg>
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-swatch" style="background:#A8D8E4;"></span>Producer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#C9CBE8;"></span>Cost (WTA)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#e4e9ed;"></span>Priced out</div>
+        <div class="legend-item"><span class="legend-swatch dashed"></span>Price</div>
+    </div>
+</div>
+
+<div class="stat-grid" aria-live="polite">
+    <div class="stat-card price">
+        <div class="stat-label">Price</div>
+        <div class="stat-value" id="stat-price">$25</div>
+    </div>
+    <div class="stat-card sellers">
+        <div class="stat-label">Sellers</div>
+        <div class="stat-value" id="stat-sellers">6 / 10</div>
+    </div>
+    <div class="stat-card revenue">
+        <div class="stat-label">Revenue</div>
+        <div class="stat-value" id="stat-revenue">$150</div>
+    </div>
+    <div class="stat-card ps-surplus">
+        <div class="stat-label">Producer surplus</div>
+        <div class="stat-value" id="stat-ps">$77</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 3 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 3</span>From people to a curve</h2>
+<p>
+In a real labor market you'd have thousands of potential sellers, and
+the ten-bar staircase smooths into an upward-sloping line &mdash; the
+<strong>supply curve</strong>. It's just sellers lined up by WTA from
+lowest to highest. The first unit produced is cheap; each additional
+unit pulls in a more expensive seller, so the curve rises.
+</p>
+<p>
+Flip between views. In the continuous uniform view, producer surplus is
+the triangle <em>above</em> the supply curve and <em>below</em> the price
+line. For a linear supply curve it's &frac12; &times; base &times; height,
+the exact mirror of the consumer surplus triangle on the other page.
+</p>
+<p>
+The pricing strategy toggle from Part 2 applies here too. Under a reverse
+auction the buyer pays each seller's own cost, so the entire area under
+the supply curve becomes cost paid out and producer surplus collapses to
+zero. The seller-side equivalent of "you captured the whole rectangle"
+is "they captured none of it."
+</p>
+
+<div class="toggle-row" role="tablist" aria-label="View mode">
+    <button class="toggle-btn active" id="toggle-discrete"
+            role="tab" aria-selected="true">Discrete</button>
+    <button class="toggle-btn" id="toggle-continuous"
+            role="tab" aria-selected="false">Continuous</button>
+</div>
+
+<div class="chart-container">
+    <svg id="chart3" class="ps-svg" viewBox="0 0 600 340"
+         role="img" aria-labelledby="chart3-title chart3-desc">
+        <title id="chart3-title">Supply curve with shaded producer surplus and cost</title>
+        <desc id="chart3-desc">Toggleable between the ten-bar discrete version and a smooth linear supply curve.</desc>
+    </svg>
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-swatch" style="background:#A8D8E4;"></span>Producer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#C9CBE8;"></span>Cost</div>
+        <div class="legend-item"><span class="legend-swatch dashed"></span>Price</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 4 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 4</span>Supply meets demand</h2>
+<p>
+Now the payoff. A real market has both sides: the ten developers from
+this page on the supply side, and the ten buyers from the
+<a href="/tools/consumer-surplus/">consumer surplus page</a> on the demand
+side. Stack them on the same axes, smooth into continuous curves, and
+you get the picture every intro textbook leads with: two lines that cross
+at <strong>equilibrium</strong>.
+</p>
+<p>
+Three regions live between them. The <span style="color:#1D9E75;
+font-weight:600;">green triangle</span> above the price line is consumer
+surplus. The <span style="color:#1E8FA8;font-weight:600;">teal triangle</span>
+below it is producer surplus. Together they are <strong>total surplus</strong>
+&mdash; the gains from trade, the reason the market exists at all.
+</p>
+<p>
+Drag the slider. At the equilibrium price $25 the two curves cross and
+every beneficial trade happens: total surplus is maximized at $125. Push
+the price <em>above</em> equilibrium and demand collapses to the short
+side &mdash; sellers would supply more, but no buyers left to buy from.
+Push it <em>below</em> and supply collapses instead. Either way, a
+<span style="color:#A32D2D;font-weight:600;">red triangle</span> of
+<strong>deadweight loss</strong> opens up: trades that would have
+benefited <em>both</em> parties, strangled by a price set at the wrong
+level.
+</p>
+
+<div class="chart-container">
+    <svg id="chart4" class="ps-svg" viewBox="0 0 600 360"
+         role="img" aria-labelledby="chart4-title chart4-desc">
+        <title id="chart4-title">Supply, demand, and the surplus triangles</title>
+        <desc id="chart4-desc">Continuous supply and demand curves with consumer surplus, producer surplus, and any deadweight loss shaded at the chosen price.</desc>
+    </svg>
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-swatch" style="background:#9FE1CB;"></span>Consumer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#A8D8E4;"></span>Producer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#FCEBEB;"></span>Deadweight loss</div>
+        <div class="legend-item"><span class="legend-swatch dashed"></span>Price</div>
+    </div>
+    <div class="regime-note" id="regime-note">
+        At the equilibrium price, the market clears and total surplus is maximized.
+    </div>
+</div>
+
+<div class="stat-grid" aria-live="polite">
+    <div class="stat-card price">
+        <div class="stat-label">Price</div>
+        <div class="stat-value" id="stat4-price">$25</div>
+    </div>
+    <div class="stat-card cs-surplus">
+        <div class="stat-label">Consumer surplus</div>
+        <div class="stat-value" id="stat4-cs">$62.50</div>
+    </div>
+    <div class="stat-card ps-surplus">
+        <div class="stat-label">Producer surplus</div>
+        <div class="stat-value" id="stat4-ps">$62.50</div>
+    </div>
+    <div class="stat-card dwl">
+        <div class="stat-label">Deadweight loss</div>
+        <div class="stat-value" id="stat4-dwl">$0.00</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PART 5 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 5</span>Why this matters in tech</h2>
+<p>
+Once you see the symmetry, a lot of product and platform decisions snap
+into focus. Here are three cases where producer surplus is the interesting
+side of the chart.
+</p>
+
+<div class="tier-examples">
+    <div class="tier-card">
+        <h3>Uber surge pricing &mdash; moving up the supply curve</h3>
+        <p>
+        Without surge, the price is a ceiling below the true equilibrium
+        on busy nights: demand spikes, supply stays flat at the regulated
+        rate, and the market clears with a shortage. Surge lifts the
+        price until more drivers log on &mdash; literally moving up the
+        supply curve. Riders grumble about the split (PS grows, CS shrinks),
+        but the quantity traded rises, and the deadweight-loss triangle
+        of "people waiting 40 minutes" collapses.
+        </p>
+    </div>
+    <div class="tier-card">
+        <h3>Cloud spot instances &mdash; selling idle capacity</h3>
+        <p>
+        The supply curve for spot compute is nearly flat near zero: the
+        servers exist whether they're used or not, so the marginal cost
+        of a spot-hour is essentially zero. Any price above that is pure
+        producer surplus. AWS and GCP's spot markets exist precisely
+        because the alternative &mdash; idling the hardware &mdash; is a
+        pile of unrealized PS that someone out there would happily pay
+        for at <em>any</em> price.
+        </p>
+    </div>
+    <div class="tier-card">
+        <h3>App Store 70/30 &mdash; splitting the surplus</h3>
+        <p>
+        When Apple takes 30% of app revenue, it's negotiating the split
+        of a specific total-surplus rectangle. Apple argues the 30% is
+        payment for distribution, trust, and a billion-device install
+        base &mdash; services that grow the total pie by bringing
+        buyers and sellers together who otherwise wouldn't meet. Developers
+        argue the 30% is a tax that transfers PS to the platform without
+        growing the pie at all. Both arguments live or die on whether
+        the platform actually expands the market.
+        </p>
+    </div>
+</div>
+
+<p style="margin-top: 2em; font-size: 1em;">
+Consumer and producer surplus are the same idea viewed from two sides
+of a transaction. Put them together and you have a complete map of
+where value in a market comes from, who captures it, and how much gets
+destroyed when a price is set in the wrong place.
+</p>
+
+</div><!-- /.ps -->
+
+<script>
+(function() {
+    'use strict';
+
+    // ---------------------------- Data --------------------------------
+    // Mirror of the CS page: same ten values, reversed so suppliers are
+    // ranked low-to-high instead of high-to-low.
+    const devs = [
+        { name: 'Noah',  role: 'Junior dev',           wta:  3 },
+        { name: 'Zoe',   role: 'Bootcamp grad',        wta:  6 },
+        { name: 'Raj',   role: 'Freelance hobbyist',   wta: 10 },
+        { name: 'Lena',  role: 'Part-time contractor', wta: 14 },
+        { name: 'Omar',  role: 'Junior engineer',      wta: 18 },
+        { name: 'Mia',   role: 'Data scientist',       wta: 22 },
+        { name: 'Kenji', role: 'Mid-level freelancer', wta: 27 },
+        { name: 'Farah', role: 'Senior engineer',      wta: 32 },
+        { name: 'Theo',  role: 'Staff engineer',       wta: 38 },
+        { name: 'Iris',  role: 'Principal engineer',   wta: 45 }
+    ];
+
+    // Linear fits used in Part 3 (continuous) and Part 4.
+    // Supply:  P = S_SLOPE * Q        → (0, $0)  to (10, $50)
+    // Demand:  P = D_INTERCEPT - D_SLOPE * Q  → (0, $50) to (10, $0)
+    // Equilibrium: Q* = 5, P* = $25.
+    const D_INTERCEPT = 50;
+    const D_SLOPE = 5;
+    const S_SLOPE = 5;
+    const P_EQ = 25;
+    const Q_EQ = 5;
+    const TOTAL_SURPLUS_MAX = 125; // ½ × 10 × 50 / 2 = 125 (the lens area)
+
+    // ---------------------------- State -------------------------------
+    let chart3Mode = 'discrete';
+    let strategy   = 'uniform';
+
+    // ---------------------------- Geometry ----------------------------
+    const W = 600, H = 340;
+    const M = { top: 20, right: 24, bottom: 58, left: 46 };
+    const plotW = W - M.left - M.right;
+    const plotH = H - M.top - M.bottom;
+    const Y_MAX = 50;
+    const X_MAX = 10;
+
+    function xScale(q) { return M.left + (q / X_MAX) * plotW; }
+    function yScale(p) { return M.top + plotH - (p / Y_MAX) * plotH; }
+    function barWidth() { return plotW / X_MAX * 0.72; }
+
+    // Chart 4 has a slightly taller viewBox to fit the regime banner inline.
+    const H4 = 360;
+    const plotH4 = H4 - M.top - M.bottom;
+    function yScale4(p) { return M.top + plotH4 - (p / Y_MAX) * plotH4; }
+
+    // Palette
+    const COLOR = {
+        costBar:     '#C9CBE8',   // cost fill (WTA bar)
+        costBarSell: '#9BA0D6',   // cost fill for active sellers (darker)
+        ps:          '#A8D8E4',   // producer surplus fill
+        psLine:      '#1E8FA8',
+        revenue:     '#BFDDD4',
+        revenueLine: '#085041',
+        cs:          '#9FE1CB',   // consumer surplus fill (mirrors CS page)
+        csLine:      '#0F6E56',
+        dwl:         '#FCEBEB',
+        dwlLine:     '#A32D2D',
+        price:       '#d85a30',
+        axis:        '#b8bfc5',
+        axisText:    '#6b7b8a',
+        grid:        '#edf0f3',
+        demand:      '#534AB7',
+        supply:      '#2D7D8F'
+    };
+
+    // ---------------------------- Helpers -----------------------------
+    const svgNS = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs, text) {
+        const e = document.createElementNS(svgNS, tag);
+        if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+        if (text != null) e.textContent = text;
+        return e;
+    }
+    function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+
+    function drawAxes(svg, opts) {
+        opts = opts || {};
+        const showQAxis = opts.showQAxis;
+        const xLabel = opts.xLabel !== undefined ? opts.xLabel : 'developers (ranked by WTA)';
+        const yLabel = opts.yLabel !== undefined ? opts.yLabel : 'price ($/mo)';
+        const ys = opts.yScale || yScale;
+        const h  = opts.plotH  || plotH;
+
+        const yTicks = [0, 10, 20, 30, 40, 50];
+        for (const t of yTicks) {
+            const y = ys(t);
+            svg.appendChild(el('line', {
+                x1: M.left, x2: W - M.right, y1: y, y2: y,
+                stroke: COLOR.grid, 'stroke-width': 1
+            }));
+            svg.appendChild(el('text', {
+                x: M.left - 8, y: y + 4,
+                'text-anchor': 'end',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, fill: COLOR.axisText
+            }, '$' + t));
+        }
+        svg.appendChild(el('line', {
+            x1: M.left, x2: M.left, y1: M.top, y2: M.top + h,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: M.top + h, y2: M.top + h,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        svg.appendChild(el('text', {
+            x: 12, y: M.top + h / 2,
+            'text-anchor': 'middle',
+            transform: `rotate(-90, 12, ${M.top + h / 2})`,
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, fill: COLOR.axisText
+        }, yLabel));
+        if (xLabel) {
+            svg.appendChild(el('text', {
+                x: M.left + plotW / 2, y: M.top + h + 44,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 11, fill: COLOR.axisText
+            }, xLabel));
+        }
+        if (showQAxis) {
+            for (let q = 0; q <= X_MAX; q += 2) {
+                const x = xScale(q);
+                svg.appendChild(el('line', {
+                    x1: x, x2: x, y1: M.top + h, y2: M.top + h + 4,
+                    stroke: COLOR.axis, 'stroke-width': 1
+                }));
+                svg.appendChild(el('text', {
+                    x: x, y: M.top + h + 16,
+                    'text-anchor': 'middle',
+                    'font-family': 'Helvetica, Arial, sans-serif',
+                    'font-size': 10, fill: COLOR.axisText
+                }, q));
+            }
+        }
+    }
+
+    // ---------------------------- Chart 1 -----------------------------
+    function renderChart1() {
+        const svg = document.getElementById('chart1');
+        clear(svg);
+        drawAxes(svg, { xLabel: '' });
+
+        const bw = barWidth();
+        devs.forEach((d, i) => {
+            const cx = xScale(i + 0.5);
+            const x = cx - bw / 2;
+            const y = yScale(d.wta);
+            const h = yScale(0) - y;
+
+            svg.appendChild(el('rect', {
+                x: x, y: y, width: bw, height: h, rx: 3,
+                fill: COLOR.supply, opacity: 0.55
+            }));
+            svg.appendChild(el('text', {
+                x: cx, y: y - 6,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif',
+                'font-size': 11, 'font-weight': 700, fill: '#2c3e50'
+            }, '$' + d.wta));
+            svg.appendChild(el('text', {
+                x: cx, y: M.top + plotH + 16,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10.5, 'font-weight': 600, fill: '#2c3e50'
+            }, d.name));
+        });
+    }
+
+    // ---------------------------- Chart 2 -----------------------------
+    function renderChart2(price) {
+        const svg = document.getElementById('chart2');
+        clear(svg);
+        drawAxes(svg, { xLabel: '' });
+
+        const bw = barWidth();
+        let revenue = 0, ps = 0, sellers = 0;
+
+        if (strategy === 'reverse') {
+            // Every dev supplies, each paid exactly their own WTA.
+            // Full bar is cost; no PS.
+            devs.forEach((d, i) => {
+                const cx = xScale(i + 0.5);
+                const x = cx - bw / 2;
+                const yTop = yScale(d.wta);
+                const yBase = yScale(0);
+                svg.appendChild(el('rect', {
+                    x: x, y: yTop, width: bw, height: yBase - yTop, rx: 3,
+                    fill: COLOR.costBar
+                }));
+                svg.appendChild(el('rect', {
+                    x: x, y: yTop, width: bw, height: yBase - yTop, rx: 3,
+                    fill: 'none', stroke: COLOR.costBarSell,
+                    'stroke-width': 1.2, opacity: 0.6
+                }));
+                svg.appendChild(el('text', {
+                    x: cx, y: yTop - 5,
+                    'text-anchor': 'middle',
+                    'font-family': 'Georgia, serif',
+                    'font-size': 10, 'font-weight': 700, fill: '#2c3e50'
+                }, '$' + d.wta));
+                svg.appendChild(el('text', {
+                    x: cx, y: M.top + plotH + 16,
+                    'text-anchor': 'middle',
+                    'font-family': 'Helvetica, Arial, sans-serif',
+                    'font-size': 10.5, 'font-weight': 600, fill: '#2c3e50'
+                }, d.name));
+                revenue += d.wta;
+                sellers++;
+            });
+            document.getElementById('stat-price').textContent = 'Per seller';
+            document.getElementById('stat-sellers').textContent = sellers + ' / 10';
+            document.getElementById('stat-revenue').textContent = '$' + revenue;
+            document.getElementById('stat-ps').textContent = '$0';
+            return;
+        }
+
+        devs.forEach((d, i) => {
+            const cx = xScale(i + 0.5);
+            const x = cx - bw / 2;
+            const isSeller = d.wta <= price;
+            const yCost = yScale(d.wta);
+            const yPrice = yScale(price);
+            const yBase = yScale(0);
+
+            if (isSeller) {
+                sellers++;
+                revenue += price;
+                ps += (price - d.wta);
+
+                // Cost portion: from 0 up to WTA
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: COLOR.costBar
+                }));
+                // PS portion: from WTA up to price
+                if (d.wta < price) {
+                    svg.appendChild(el('rect', {
+                        x: x, y: yPrice, width: bw, height: yCost - yPrice, rx: 3,
+                        fill: COLOR.ps
+                    }));
+                    const gap = yCost - yPrice;
+                    if (gap > 18) {
+                        svg.appendChild(el('text', {
+                            x: cx, y: yPrice + gap / 2 + 3,
+                            'text-anchor': 'middle',
+                            'font-family': 'Georgia, serif',
+                            'font-size': 10, 'font-weight': 700,
+                            fill: COLOR.psLine
+                        }, '+$' + (price - d.wta)));
+                    }
+                }
+                // Outline the full "earnings rectangle" (0 → price)
+                svg.appendChild(el('rect', {
+                    x: x, y: yPrice, width: bw, height: yBase - yPrice, rx: 3,
+                    fill: 'none', stroke: COLOR.psLine,
+                    'stroke-width': 1.2, opacity: 0.5
+                }));
+            } else {
+                // Priced out: WTA sits above the market price.
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: COLOR.costBar, opacity: 0.35
+                }));
+            }
+
+            svg.appendChild(el('text', {
+                x: cx, y: yCost - 5,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif',
+                'font-size': 10,
+                'font-weight': isSeller ? 700 : 500,
+                fill: isSeller ? '#2c3e50' : '#9aa3aa'
+            }, '$' + d.wta));
+
+            svg.appendChild(el('text', {
+                x: cx, y: M.top + plotH + 16,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10.5,
+                'font-weight': isSeller ? 600 : 400,
+                fill: isSeller ? '#2c3e50' : '#9aa3aa'
+            }, d.name));
+        });
+
+        // Price line
+        const py = yScale(price);
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: py, y2: py,
+            stroke: COLOR.price, 'stroke-width': 2,
+            'stroke-dasharray': '6 4'
+        }));
+        svg.appendChild(el('text', {
+            x: W - M.right - 2, y: py - 5,
+            'text-anchor': 'end',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, 'font-weight': 700, fill: COLOR.price
+        }, 'Price $' + price));
+
+        // "priced out" annotation on the right-side bars
+        const firstNonSeller = devs.findIndex(d => d.wta > price);
+        if (firstNonSeller !== -1) {
+            const xStart = xScale(firstNonSeller);
+            const xEnd = xScale(devs.length);
+            const midX = (xStart + xEnd) / 2;
+            // Pick a y that sits above the first non-seller's bar top
+            const topOfNonSeller = yScale(devs[firstNonSeller].wta);
+            if (topOfNonSeller > M.top + 14) {
+                svg.appendChild(el('text', {
+                    x: midX, y: topOfNonSeller - 12,
+                    'text-anchor': 'middle',
+                    'font-family': 'Helvetica, Arial, sans-serif',
+                    'font-size': 9.5, 'font-style': 'italic',
+                    fill: '#8a959e'
+                }, 'priced out'));
+            }
+        }
+
+        document.getElementById('stat-price').textContent = '$' + price;
+        document.getElementById('stat-sellers').textContent = sellers + ' / 10';
+        document.getElementById('stat-revenue').textContent = '$' + revenue;
+        document.getElementById('stat-ps').textContent = '$' + ps;
+    }
+
+    // ---------------------------- Chart 3 -----------------------------
+    function renderChart3(price) {
+        const svg = document.getElementById('chart3');
+        clear(svg);
+        drawAxes(svg, { showQAxis: true, xLabel: 'quantity (units supplied)' });
+
+        if (chart3Mode === 'discrete') {
+            renderChart3Discrete(svg, price);
+        } else {
+            renderChart3Continuous(svg, price);
+        }
+    }
+
+    function renderChart3Discrete(svg, price) {
+        const bw = barWidth();
+
+        if (strategy === 'reverse') {
+            devs.forEach((d, i) => {
+                const cx = xScale(i + 0.5);
+                const x = cx - bw / 2;
+                const yCost = yScale(d.wta);
+                const yBase = yScale(0);
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: COLOR.costBar
+                }));
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: 'none', stroke: COLOR.costBarSell,
+                    'stroke-width': 1, opacity: 0.5
+                }));
+            });
+            return;
+        }
+
+        devs.forEach((d, i) => {
+            const cx = xScale(i + 0.5);
+            const x = cx - bw / 2;
+            const isSeller = d.wta <= price;
+            const yCost = yScale(d.wta);
+            const yPrice = yScale(price);
+            const yBase = yScale(0);
+
+            if (isSeller) {
+                // Cost rectangle
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: COLOR.costBar
+                }));
+                // PS rectangle (above cost)
+                if (d.wta < price) {
+                    svg.appendChild(el('rect', {
+                        x: x, y: yPrice, width: bw, height: yCost - yPrice, rx: 3,
+                        fill: COLOR.ps
+                    }));
+                }
+                svg.appendChild(el('rect', {
+                    x: x, y: yPrice, width: bw, height: yBase - yPrice, rx: 3,
+                    fill: 'none', stroke: COLOR.psLine,
+                    'stroke-width': 1, opacity: 0.5
+                }));
+            } else {
+                svg.appendChild(el('rect', {
+                    x: x, y: yCost, width: bw, height: yBase - yCost, rx: 3,
+                    fill: COLOR.costBar, opacity: 0.35
+                }));
+            }
+        });
+
+        drawPriceLine(svg, price);
+    }
+
+    function renderChart3Continuous(svg, price) {
+        // Supply: P = S_SLOPE * Q, clipped to [0, Y_MAX] and Q in [0, X_MAX]
+        // Marginal seller at this price: Q*_P = price / S_SLOPE
+        const qStar = Math.max(0, Math.min(X_MAX, price / S_SLOPE));
+        const qMax = Math.min(X_MAX, Y_MAX / S_SLOPE);
+        const pMaxAtQMax = Math.min(Y_MAX, S_SLOPE * qMax);
+
+        // Supply curve endpoints: (0, 0) → (qMax, pMaxAtQMax)
+        const curveStart = { x: xScale(0), y: yScale(0) };
+        const curveEnd   = { x: xScale(qMax), y: yScale(pMaxAtQMax) };
+
+        if (strategy === 'reverse') {
+            // Whole area under the supply curve is cost paid out.
+            const pts = [
+                [xScale(0), yScale(0)],
+                [xScale(qMax), yScale(pMaxAtQMax)],
+                [xScale(qMax), yScale(0)]
+            ].map(p => p.join(',')).join(' ');
+            svg.appendChild(el('polygon', {
+                points: pts, fill: COLOR.costBar, opacity: 0.95
+            }));
+            svg.appendChild(el('line', {
+                x1: curveStart.x, y1: curveStart.y,
+                x2: curveEnd.x,   y2: curveEnd.y,
+                stroke: COLOR.supply, 'stroke-width': 2.5
+            }));
+            svg.appendChild(el('text', {
+                x: curveEnd.x - 6, y: curveEnd.y - 10,
+                'text-anchor': 'end',
+                'font-family': 'Georgia, serif', 'font-size': 11,
+                'font-weight': 700, fill: COLOR.supply
+            }, 'Supply'));
+            svg.appendChild(el('text', {
+                x: xScale(qMax / 2), y: yScale(Y_MAX / 6) + 3,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif', 'font-size': 12,
+                'font-weight': 700, fill: '#6b7b8a'
+            }, 'cost paid out = $250'));
+            return;
+        }
+
+        // Producer surplus triangle:
+        //   corners: (0, 0), (qStar, price), (0, price)
+        // Because the supply curve passes through (0, 0) and (qStar, price=5*qStar).
+        if (qStar > 0 && price > 0) {
+            const pts = [
+                [xScale(0), yScale(price)],
+                [xScale(qStar), yScale(price)],
+                [xScale(0), yScale(0)]
+            ].map(p => p.join(',')).join(' ');
+            svg.appendChild(el('polygon', {
+                points: pts, fill: COLOR.ps, opacity: 0.9
+            }));
+        }
+
+        // Cost region: triangle below the supply curve from (0,0) to (qStar, price)
+        if (qStar > 0) {
+            const pts = [
+                [xScale(0), yScale(0)],
+                [xScale(qStar), yScale(0)],
+                [xScale(qStar), yScale(price)]
+            ].map(p => p.join(',')).join(' ');
+            svg.appendChild(el('polygon', {
+                points: pts, fill: COLOR.costBar, opacity: 0.9
+            }));
+        }
+
+        // Supply curve
+        svg.appendChild(el('line', {
+            x1: curveStart.x, y1: curveStart.y,
+            x2: curveEnd.x,   y2: curveEnd.y,
+            stroke: COLOR.supply, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('text', {
+            x: curveEnd.x - 6, y: curveEnd.y - 10,
+            'text-anchor': 'end',
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.supply
+        }, 'Supply'));
+
+        drawPriceLine(svg, price);
+
+        // Dashed drop from (qStar, price) to x-axis, label Q*
+        if (qStar > 0 && qStar < X_MAX) {
+            svg.appendChild(el('line', {
+                x1: xScale(qStar), x2: xScale(qStar),
+                y1: yScale(price), y2: yScale(0),
+                stroke: COLOR.axis, 'stroke-width': 1,
+                'stroke-dasharray': '3 3'
+            }));
+            svg.appendChild(el('circle', {
+                cx: xScale(qStar), cy: yScale(price), r: 4,
+                fill: '#fff', stroke: COLOR.supply, 'stroke-width': 2
+            }));
+            svg.appendChild(el('text', {
+                x: xScale(qStar), y: yScale(0) + 30,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif', 'font-size': 10.5,
+                'font-weight': 700, fill: '#2c3e50'
+            }, 'Q = ' + qStar.toFixed(1)));
+        }
+
+        // Region labels
+        if (qStar > 1.2 && price > 6) {
+            svg.appendChild(el('text', {
+                x: xScale(qStar / 3), y: yScale(price * 2 / 3) + 3,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif', 'font-size': 10,
+                'font-weight': 700, fill: COLOR.psLine
+            }, 'surplus'));
+        }
+        if (qStar > 1.5 && price > 10) {
+            svg.appendChild(el('text', {
+                x: xScale(qStar * 0.7), y: yScale(price / 3) + 3,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif', 'font-size': 10,
+                'font-weight': 700, fill: '#6b7b8a'
+            }, 'cost'));
+        }
+    }
+
+    function drawPriceLine(svg, price) {
+        const py = yScale(price);
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: py, y2: py,
+            stroke: COLOR.price, 'stroke-width': 2,
+            'stroke-dasharray': '6 4'
+        }));
+        svg.appendChild(el('text', {
+            x: W - M.right - 2, y: py - 5,
+            'text-anchor': 'end',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, 'font-weight': 700, fill: COLOR.price
+        }, 'Price $' + price));
+    }
+
+    // ---------------------------- Chart 4 -----------------------------
+    //
+    // Joint view: continuous supply + demand curves, with CS / PS / DWL
+    // shading. The quantity actually traded is the SHORT side of the
+    // market: min(quantity demanded, quantity supplied) at the given
+    // price. At equilibrium the two match and DWL = 0.
+    //
+    function renderChart4(price) {
+        const svg = document.getElementById('chart4');
+        clear(svg);
+        drawAxes(svg, {
+            showQAxis: true,
+            xLabel: 'quantity',
+            yScale: yScale4,
+            plotH: plotH4
+        });
+
+        // Curve endpoints
+        const supplyStart = { x: xScale(0), y: yScale4(0) };
+        const supplyEnd   = { x: xScale(X_MAX), y: yScale4(S_SLOPE * X_MAX) };
+        const demandStart = { x: xScale(0), y: yScale4(D_INTERCEPT) };
+        const demandEnd   = { x: xScale(X_MAX), y: yScale4(D_INTERCEPT - D_SLOPE * X_MAX) };
+
+        // Quantities at this price
+        const qS = Math.max(0, Math.min(X_MAX, price / S_SLOPE));
+        const qD = Math.max(0, Math.min(X_MAX, (D_INTERCEPT - price) / D_SLOPE));
+        const qT = Math.min(qS, qD);     // actually traded (short side)
+
+        // ---- Consumer surplus ----
+        // Always bounded above by the demand curve, below by the price line,
+        // from q = 0 to q = qT.
+        //   If qT = qD (demand is short or binding): triangle
+        //     (0, price), (0, D_INTERCEPT), (qD, price)
+        //   If qT = qS (supply is short): trapezoid
+        //     (0, price), (0, D_INTERCEPT), (qS, D_INTERCEPT - D_SLOPE*qS), (qS, price)
+        if (qT > 0 && price < D_INTERCEPT) {
+            const pts = (qT >= qD - 1e-9)
+                ? [
+                    [xScale(0), yScale4(price)],
+                    [xScale(0), yScale4(D_INTERCEPT)],
+                    [xScale(qT), yScale4(price)]
+                ]
+                : [
+                    [xScale(0), yScale4(price)],
+                    [xScale(0), yScale4(D_INTERCEPT)],
+                    [xScale(qT), yScale4(D_INTERCEPT - D_SLOPE * qT)],
+                    [xScale(qT), yScale4(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.cs, opacity: 0.9
+            }));
+        }
+
+        // ---- Producer surplus ----
+        // Bounded below by the supply curve, above by the price line,
+        // from q = 0 to q = qT.
+        //   If qT = qS: triangle (0, 0), (qS, price), (0, price)
+        //   If qT = qD (supply could do more): trapezoid
+        //     (0, 0), (qD, S_SLOPE*qD), (qD, price), (0, price)
+        if (qT > 0 && price > 0) {
+            const pts = (qT >= qS - 1e-9)
+                ? [
+                    [xScale(0), yScale4(0)],
+                    [xScale(qT), yScale4(price)],
+                    [xScale(0), yScale4(price)]
+                ]
+                : [
+                    [xScale(0), yScale4(0)],
+                    [xScale(qT), yScale4(S_SLOPE * qT)],
+                    [xScale(qT), yScale4(price)],
+                    [xScale(0), yScale4(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.ps, opacity: 0.9
+            }));
+        }
+
+        // ---- Deadweight loss ----
+        // Triangle between the two curves from qT to Q_EQ.
+        //   Vertices: (qT, supply at qT), (qT, demand at qT), (Q_EQ, P_EQ).
+        if (qT < Q_EQ - 1e-9) {
+            const pts = [
+                [xScale(qT), yScale4(S_SLOPE * qT)],
+                [xScale(qT), yScale4(D_INTERCEPT - D_SLOPE * qT)],
+                [xScale(Q_EQ), yScale4(P_EQ)]
+            ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.dwl, opacity: 0.95
+            }));
+        }
+
+        // ---- Curves ----
+        svg.appendChild(el('line', {
+            x1: supplyStart.x, y1: supplyStart.y,
+            x2: supplyEnd.x,   y2: supplyEnd.y,
+            stroke: COLOR.supply, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('line', {
+            x1: demandStart.x, y1: demandStart.y,
+            x2: demandEnd.x,   y2: demandEnd.y,
+            stroke: COLOR.demand, 'stroke-width': 2.5
+        }));
+        // Curve labels
+        svg.appendChild(el('text', {
+            x: supplyEnd.x - 6, y: supplyEnd.y - 8,
+            'text-anchor': 'end',
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.supply
+        }, 'Supply'));
+        svg.appendChild(el('text', {
+            x: demandStart.x + 6, y: demandStart.y + 14,
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.demand
+        }, 'Demand'));
+
+        // Equilibrium dot
+        svg.appendChild(el('circle', {
+            cx: xScale(Q_EQ), cy: yScale4(P_EQ), r: 5,
+            fill: '#fff', stroke: '#2c3e50', 'stroke-width': 2
+        }));
+        svg.appendChild(el('text', {
+            x: xScale(Q_EQ) + 8, y: yScale4(P_EQ) - 8,
+            'font-family': 'Georgia, serif', 'font-size': 10.5,
+            'font-weight': 700, fill: '#2c3e50'
+        }, 'Equilibrium'));
+
+        // ---- Price line ----
+        const py = yScale4(price);
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: py, y2: py,
+            stroke: COLOR.price, 'stroke-width': 2,
+            'stroke-dasharray': '6 4'
+        }));
+        svg.appendChild(el('text', {
+            x: W - M.right - 2, y: py - 5,
+            'text-anchor': 'end',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, 'font-weight': 700, fill: COLOR.price
+        }, 'Price $' + price));
+
+        // Dashed drop to Q traded
+        if (qT > 0 && qT < X_MAX) {
+            svg.appendChild(el('line', {
+                x1: xScale(qT), x2: xScale(qT),
+                y1: py, y2: yScale4(0),
+                stroke: COLOR.axis, 'stroke-width': 1,
+                'stroke-dasharray': '3 3'
+            }));
+            svg.appendChild(el('text', {
+                x: xScale(qT), y: yScale4(0) + 30,
+                'text-anchor': 'middle',
+                'font-family': 'Georgia, serif', 'font-size': 10.5,
+                'font-weight': 700, fill: '#2c3e50'
+            }, 'Q = ' + qT.toFixed(1)));
+        }
+
+        // ---- Compute and publish stats ----
+        //
+        // CS = ∫₀^{qT} (D_INTERCEPT - D_SLOPE*q - price) dq
+        //    = (D_INTERCEPT - price)*qT - D_SLOPE*qT²/2
+        const cs = (D_INTERCEPT - price) * qT - (D_SLOPE * qT * qT) / 2;
+        // PS = ∫₀^{qT} (price - S_SLOPE*q) dq
+        //    = price*qT - S_SLOPE*qT²/2
+        const ps = price * qT - (S_SLOPE * qT * qT) / 2;
+        // DWL = TOTAL_SURPLUS_MAX - (cs + ps)
+        const dwl = Math.max(0, TOTAL_SURPLUS_MAX - cs - ps);
+
+        document.getElementById('stat4-price').textContent = '$' + price;
+        document.getElementById('stat4-cs').textContent = '$' + cs.toFixed(2);
+        document.getElementById('stat4-ps').textContent = '$' + ps.toFixed(2);
+        document.getElementById('stat4-dwl').textContent = '$' + dwl.toFixed(2);
+
+        // Regime note
+        const note = document.getElementById('regime-note');
+        if (Math.abs(price - P_EQ) < 1e-9) {
+            note.innerHTML = 'At the equilibrium price, the market clears and total surplus is maximized.';
+        } else if (price > P_EQ) {
+            note.innerHTML = '<strong>Price above equilibrium.</strong> Demand is the short side &mdash; buyers want only ' +
+                qD.toFixed(1) + ' units, so sellers are left with unsold supply. DWL = $' + dwl.toFixed(2) + '.';
+        } else {
+            note.innerHTML = '<strong>Price below equilibrium.</strong> Supply is the short side &mdash; sellers only offer ' +
+                qS.toFixed(1) + ' units, so buyers line up for a shortage. DWL = $' + dwl.toFixed(2) + '.';
+        }
+    }
+
+    // ---------------------------- Wire up -----------------------------
+    const slider = document.getElementById('price-slider');
+    const numInput = document.getElementById('price-num');
+    const toggleD = document.getElementById('toggle-discrete');
+    const toggleC = document.getElementById('toggle-continuous');
+    const stratU = document.getElementById('strat-uniform');
+    const stratR = document.getElementById('strat-reverse');
+    const sliderWrap = document.getElementById('slider-wrap');
+
+    function applyStrategyUI() {
+        const reverse = strategy === 'reverse';
+        slider.disabled = reverse;
+        numInput.disabled = reverse;
+        sliderWrap.style.opacity = reverse ? 0.45 : 1;
+        sliderWrap.style.pointerEvents = reverse ? 'none' : 'auto';
+        stratU.classList.toggle('active', !reverse);
+        stratR.classList.toggle('active', reverse);
+        stratU.setAttribute('aria-selected', reverse ? 'false' : 'true');
+        stratR.setAttribute('aria-selected', reverse ? 'true' : 'false');
+    }
+
+    function renderAllInteractive() {
+        const p = parseInt(slider.value, 10);
+        renderChart2(p);
+        renderChart3(p);
+        renderChart4(p);
+    }
+
+    slider.addEventListener('input', () => {
+        numInput.value = slider.value;
+        renderAllInteractive();
+    });
+    numInput.addEventListener('input', () => {
+        let v = parseInt(numInput.value, 10);
+        if (isNaN(v)) return;
+        v = Math.max(0, Math.min(50, v));
+        slider.value = v;
+        renderAllInteractive();
+    });
+
+    toggleD.addEventListener('click', () => {
+        chart3Mode = 'discrete';
+        toggleD.classList.add('active');
+        toggleD.setAttribute('aria-selected', 'true');
+        toggleC.classList.remove('active');
+        toggleC.setAttribute('aria-selected', 'false');
+        renderChart3(parseInt(slider.value, 10));
+    });
+    toggleC.addEventListener('click', () => {
+        chart3Mode = 'continuous';
+        toggleC.classList.add('active');
+        toggleC.setAttribute('aria-selected', 'true');
+        toggleD.classList.remove('active');
+        toggleD.setAttribute('aria-selected', 'false');
+        renderChart3(parseInt(slider.value, 10));
+    });
+
+    stratU.addEventListener('click', () => {
+        strategy = 'uniform';
+        applyStrategyUI();
+        renderAllInteractive();
+    });
+    stratR.addEventListener('click', () => {
+        strategy = 'reverse';
+        applyStrategyUI();
+        renderAllInteractive();
+    });
+
+    // Roster under chart 1
+    const roster = document.getElementById('roster');
+    devs.forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'roster-item';
+        div.innerHTML = '<span><strong>' + d.name + '</strong> &middot; ' + d.role + '</span>';
+        roster.appendChild(div);
+    });
+
+    // Initial render
+    renderChart1();
+    applyStrategyUI();
+    renderAllInteractive();
+})();
+</script>
