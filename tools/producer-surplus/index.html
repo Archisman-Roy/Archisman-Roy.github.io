@@ -563,6 +563,124 @@ about efficiency &mdash; it's almost always about whether that
 redistribution is acceptable in the rain.
 </p>
 
+<!-- ============================================================ -->
+<!-- PART 7 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 7</span>When supply goes the other way: the chip shortage</h2>
+<p>
+Part 6 held supply fixed and moved demand. Now do the mirror. In 2021
+the world ran out of semiconductors. COVID had shut down fabs early in
+the pandemic; meanwhile locked-down households bought laptops,
+monitors, and game consoles at twice the normal pace. Automakers, who
+had cancelled their chip orders in mid-2020, scrambled back in line
+and landed at the end of a 52-week queue. For simplicity we'll hold
+demand fixed here and let the <em>supply</em> curve do all the moving.
+</p>
+<p>
+In supply-and-demand language, this is a <strong>supply contraction</strong>:
+at every price, fewer chips are available. The supply curve shifts
+up and to the left &mdash; even the cheapest chip now requires a higher
+minimum price to get made.
+</p>
+<p>
+Drag the <strong>supply shift</strong> slider from 0 (normal) toward 30
+(shortage peak). Then flip the <strong>pricing</strong> toggle. With
+pricing <em>flexible</em>, prices float to clear the new market &mdash;
+which is what happened on eBay, in used-car lots, and in every
+scalper-driven secondary market during 2021. With pricing
+<em>rigid</em>, the price stays stuck at the old equilibrium of $25
+&mdash; effectively what Nvidia's $699 MSRP, dealer window stickers,
+and long-standing contract pricing did in the primary channels.
+Instead of clearing on price, the shortage cleared on <em>allocation</em>:
+waitlists, dealer-only lotteries, and empty shelves.
+</p>
+
+<div class="controls-panel">
+    <div class="control-group" style="margin-bottom: 14px;">
+        <span class="control-label" style="margin-bottom: 8px;">Pricing</span>
+        <div class="toggle-row" style="margin: 0;" role="tablist" aria-label="Pricing">
+            <button class="toggle-btn" id="chip-rigid"
+                    role="tab" aria-selected="false">Rigid (MSRP)</button>
+            <button class="toggle-btn active" id="chip-flex"
+                    role="tab" aria-selected="true">Flexible</button>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="chip-shift">Supply shift (normal &rarr; shortage peak)</label>
+        <div class="control-input-row">
+            <input type="range" id="chip-shift" class="control-slider"
+                   min="0" max="30" step="1" value="0"
+                   aria-label="Supply shift magnitude">
+            <input type="number" id="chip-shift-num" class="control-num"
+                   min="0" max="30" step="1" value="0">
+        </div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <svg id="chart6" class="ps-svg" viewBox="0 0 600 360"
+         role="img" aria-labelledby="chart6-title chart6-desc">
+        <title id="chart6-title">Chip market with supply contraction</title>
+        <desc id="chart6-desc">Demand curve fixed while supply shifts up/left; price either clears the new market (flexible) or stays pinned at the old equilibrium (rigid), producing unfilled orders.</desc>
+    </svg>
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-swatch" style="background:#9FE1CB;"></span>Buyer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#A8D8E4;"></span>Producer surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#FCEBEB;"></span>Deadweight loss</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#FFE7C2;"></span>Unfilled orders</div>
+        <div class="legend-item"><span class="legend-swatch dashed"></span>Price</div>
+    </div>
+    <div class="regime-note" id="chip-regime-note">
+        Normal supply, flexible pricing. Market clears at $25 with no shortage.
+    </div>
+</div>
+
+<div class="stat-grid" aria-live="polite">
+    <div class="stat-card price">
+        <div class="stat-label">Price</div>
+        <div class="stat-value" id="chip-stat-price">$25</div>
+    </div>
+    <div class="stat-card sellers">
+        <div class="stat-label">Chips produced</div>
+        <div class="stat-value" id="chip-stat-units">5.0</div>
+    </div>
+    <div class="stat-card dwl">
+        <div class="stat-label">Unfilled orders</div>
+        <div class="stat-value" id="chip-stat-unfilled">0.0</div>
+    </div>
+    <div class="stat-card ps-surplus">
+        <div class="stat-label">Producer surplus</div>
+        <div class="stat-value" id="chip-stat-ps">$62.50</div>
+    </div>
+</div>
+
+<p style="margin-top: 1.4em;">
+Push the supply shift toward 30 with pricing flexible. The price climbs
+to $40, the market clears on fewer units (3 instead of 5), and no one
+is left empty-handed &mdash; buyers who valued chips less than the new
+price simply stepped back. Producer surplus <em>grows</em> on a
+per-unit basis even though total chips produced fell: the surviving
+sellers enjoy a wider margin over the shifted supply curve.
+</p>
+<p>
+Now flip to rigid pricing at that same supply shift. Price stays at
+$25, so only one chip gets made, four orders go unfilled, and a fat
+red deadweight-loss triangle opens up between the two curves. The PS
+that flexible pricing unlocked collapses, and buyers don't capture it
+either &mdash; it's just gone. In 2021 this surplus didn't fully
+vanish; much of it reappeared in secondary markets (a scalped 3080 on
+eBay, a $5k markup on a used Tacoma) because the rigidity was on
+<em>new</em> prices, not <em>all</em> prices.
+</p>
+<p>
+The symmetry with Part 6 is the point. When the equilibrium price
+rises &mdash; whether because demand moved right or supply moved left
+&mdash; and the market isn't allowed to follow, a shortage appears on
+the short side and a DWL triangle opens between the curves. The
+pricing mechanism is the same lever. What changes is which side of the
+market pulled it.
+</p>
+
 </div><!-- /.ps -->
 
 <script>
@@ -1686,5 +1804,318 @@ redistribution is acceptable in the rain.
 
     applyUberUI();
     renderChart5();
+
+    // =================================================================
+    // Chart 6 — Chip shortage (supply contraction)
+    //
+    // Demand is fixed at the Part-4 baseline: P = 50 - 5Q.
+    // Supply is shifted upward by a (the chipShift slider):
+    //     P = a + 5Q
+    // So at a = 0 the market looks like Part 4. As a rises, even the
+    // cheapest chip needs a higher minimum price before it gets made,
+    // and the new equilibrium is Q* = (50 - a)/10, P* = (50 + a)/2.
+    //
+    // "Rigid" pricing pins the price at the baseline $25 even when the
+    // shifted supply can't meet quantity demanded at that price — the
+    // MSRP-stickiness analogue of Part 6's non-surge regime.
+    // =================================================================
+    const H6 = 360;
+    const X_MAX6 = 10;
+    const Y_MAX6 = 60;
+    const plotH6 = H6 - M.top - M.bottom;
+    function xScale6(q) { return M.left + (q / X_MAX6) * plotW; }
+    function yScale6(p) { return M.top + plotH6 - (p / Y_MAX6) * plotH6; }
+
+    const BASELINE_PRICE_CHIP = 25;
+    let chipShift = 0;
+    let chipFlex = true;
+
+    function drawChart6Axes(svg) {
+        const yTicks = [0, 10, 20, 30, 40, 50, 60];
+        for (const t of yTicks) {
+            const y = yScale6(t);
+            svg.appendChild(el('line', {
+                x1: M.left, x2: W - M.right, y1: y, y2: y,
+                stroke: COLOR.grid, 'stroke-width': 1
+            }));
+            svg.appendChild(el('text', {
+                x: M.left - 8, y: y + 4,
+                'text-anchor': 'end',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, fill: COLOR.axisText
+            }, '$' + t));
+        }
+        svg.appendChild(el('line', {
+            x1: M.left, x2: M.left, y1: M.top, y2: M.top + plotH6,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: M.top + plotH6, y2: M.top + plotH6,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        for (let q = 0; q <= X_MAX6; q += 2) {
+            const x = xScale6(q);
+            svg.appendChild(el('line', {
+                x1: x, x2: x, y1: M.top + plotH6, y2: M.top + plotH6 + 4,
+                stroke: COLOR.axis, 'stroke-width': 1
+            }));
+            svg.appendChild(el('text', {
+                x: x, y: M.top + plotH6 + 16,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, fill: COLOR.axisText
+            }, q));
+        }
+        svg.appendChild(el('text', {
+            x: 12, y: M.top + plotH6 / 2,
+            'text-anchor': 'middle',
+            transform: `rotate(-90, 12, ${M.top + plotH6 / 2})`,
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, fill: COLOR.axisText
+        }, 'price per chip ($)'));
+        svg.appendChild(el('text', {
+            x: M.left + plotW / 2, y: M.top + plotH6 + 44,
+            'text-anchor': 'middle',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, fill: COLOR.axisText
+        }, 'chips per quarter'));
+    }
+
+    function renderChart6() {
+        const svg = document.getElementById('chart6');
+        clear(svg);
+        drawChart6Axes(svg);
+
+        const a = chipShift;
+        const qEq = Math.max(0, (50 - a) / 10);
+        const pEq = (50 + a) / 2;
+
+        const price = chipFlex ? pEq : BASELINE_PRICE_CHIP;
+        const qS = Math.max(0, Math.min(X_MAX6, (price - a) / 5));
+        const qD = Math.max(0, Math.min(X_MAX6, (50 - price) / 5));
+        const qT = Math.min(qS, qD);
+        const unfilled = Math.max(0, qD - qS);
+
+        // Surplus (linear; efficient rationing for CS under rigid pricing)
+        const cs = (50 - price) * qT - 2.5 * qT * qT;
+        const ps = (price - a) * qT - 2.5 * qT * qT;
+        const totalMax = Math.max(0, (50 - a) * qEq / 2);
+        const dwl = Math.max(0, totalMax - cs - ps);
+
+        // ---------- Buyer surplus (CS) ----------
+        if (qT > 0 && price < 50) {
+            const pts = (qT >= qD - 1e-9)
+                ? [
+                    [xScale6(0), yScale6(price)],
+                    [xScale6(0), yScale6(50)],
+                    [xScale6(qT), yScale6(price)]
+                ]
+                : [
+                    [xScale6(0), yScale6(price)],
+                    [xScale6(0), yScale6(50)],
+                    [xScale6(qT), yScale6(50 - 5 * qT)],
+                    [xScale6(qT), yScale6(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.cs, opacity: 0.9
+            }));
+        }
+
+        // ---------- Producer surplus (PS) ----------
+        if (qT > 0 && price > a) {
+            const pts = (qT >= qS - 1e-9)
+                ? [
+                    [xScale6(0), yScale6(a)],
+                    [xScale6(qT), yScale6(price)],
+                    [xScale6(0), yScale6(price)]
+                ]
+                : [
+                    [xScale6(0), yScale6(a)],
+                    [xScale6(qT), yScale6(a + 5 * qT)],
+                    [xScale6(qT), yScale6(price)],
+                    [xScale6(0), yScale6(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.ps, opacity: 0.9
+            }));
+        }
+
+        // ---------- Deadweight loss ----------
+        if (qT < qEq - 1e-9) {
+            const pts = [
+                [xScale6(qT), yScale6(a + 5 * qT)],
+                [xScale6(qT), yScale6(50 - 5 * qT)],
+                [xScale6(qEq), yScale6(pEq)]
+            ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.dwl, opacity: 0.95
+            }));
+        }
+
+        // ---------- Unfilled-orders band on x-axis ----------
+        if (unfilled > 0.01) {
+            const y0 = yScale6(0);
+            svg.appendChild(el('rect', {
+                x: xScale6(qS), y: y0 + 3,
+                width: xScale6(qD) - xScale6(qS), height: 5,
+                fill: '#FFE7C2', stroke: '#E2A65A', 'stroke-width': 0.8
+            }));
+            svg.appendChild(el('text', {
+                x: (xScale6(qS) + xScale6(qD)) / 2, y: y0 + 22,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, 'font-style': 'italic',
+                fill: '#8a6b3a'
+            }, 'unfilled ' + unfilled.toFixed(1)));
+        }
+
+        // ---------- Curves ----------
+        // Baseline supply (dashed, only if supply has shifted)
+        if (a > 0) {
+            const qBaseMax = Math.min(X_MAX6, Y_MAX6 / 5);
+            svg.appendChild(el('line', {
+                x1: xScale6(0), y1: yScale6(0),
+                x2: xScale6(qBaseMax), y2: yScale6(5 * qBaseMax),
+                stroke: COLOR.supply, 'stroke-width': 1.2,
+                'stroke-dasharray': '4 3', opacity: 0.4
+            }));
+            svg.appendChild(el('text', {
+                x: xScale6(qBaseMax) - 4, y: yScale6(5 * qBaseMax) + 14,
+                'text-anchor': 'end',
+                'font-family': 'Georgia, serif', 'font-size': 9.5,
+                'font-style': 'italic', fill: COLOR.supply, opacity: 0.7
+            }, 'pre-shortage supply'));
+        }
+        // Shifted supply (solid)
+        const sEndQ = Math.min(X_MAX6, (Y_MAX6 - a) / 5);
+        const sEndP = a + 5 * sEndQ;
+        svg.appendChild(el('line', {
+            x1: xScale6(0), y1: yScale6(a),
+            x2: xScale6(sEndQ), y2: yScale6(sEndP),
+            stroke: COLOR.supply, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('text', {
+            x: xScale6(sEndQ) - 6, y: yScale6(sEndP) - 8,
+            'text-anchor': 'end',
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.supply
+        }, a > 0 ? 'Supply (contracted)' : 'Supply'));
+
+        // Demand (fixed)
+        svg.appendChild(el('line', {
+            x1: xScale6(0), y1: yScale6(50),
+            x2: xScale6(10), y2: yScale6(0),
+            stroke: COLOR.demand, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('text', {
+            x: xScale6(0) + 6, y: yScale6(50) + 14,
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.demand
+        }, 'Demand'));
+
+        // Equilibrium dot (where shifted supply meets demand)
+        if (qEq > 0 && pEq <= Y_MAX6 && qEq <= X_MAX6) {
+            svg.appendChild(el('circle', {
+                cx: xScale6(qEq), cy: yScale6(pEq), r: 5,
+                fill: '#fff', stroke: '#2c3e50', 'stroke-width': 2
+            }));
+            svg.appendChild(el('text', {
+                x: xScale6(qEq) + 8, y: yScale6(pEq) - 8,
+                'font-family': 'Georgia, serif', 'font-size': 10.5,
+                'font-weight': 700, fill: '#2c3e50'
+            }, chipFlex ? 'Market clears' : 'Would-be equilibrium'));
+        }
+
+        // Price line
+        const py = yScale6(price);
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: py, y2: py,
+            stroke: COLOR.price, 'stroke-width': 2,
+            'stroke-dasharray': '6 4'
+        }));
+        svg.appendChild(el('text', {
+            x: W - M.right - 2, y: py - 5,
+            'text-anchor': 'end',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, 'font-weight': 700, fill: COLOR.price
+        }, 'Price ' + fmtPrice(price)));
+
+        // Drop line at quantity produced
+        if (qT > 0 && qT < X_MAX6) {
+            svg.appendChild(el('line', {
+                x1: xScale6(qT), x2: xScale6(qT),
+                y1: py, y2: yScale6(0),
+                stroke: COLOR.axis, 'stroke-width': 1,
+                'stroke-dasharray': '3 3'
+            }));
+        }
+
+        // ---------- Stats & regime note ----------
+        document.getElementById('chip-stat-price').textContent = fmtPrice(price);
+        document.getElementById('chip-stat-units').textContent = qT.toFixed(1);
+        document.getElementById('chip-stat-unfilled').textContent = unfilled.toFixed(1);
+        document.getElementById('chip-stat-ps').textContent = '$' + ps.toFixed(2);
+
+        const note = document.getElementById('chip-regime-note');
+        if (chipFlex) {
+            if (a === 0) {
+                note.innerHTML = '<strong>Normal supply, flexible pricing.</strong> Market clears at $25 with no shortage.';
+            } else {
+                note.innerHTML = '<strong>Supply contracted, flexible pricing.</strong> Price rises to ' + fmtPrice(price) +
+                    ', ' + qT.toFixed(1) + ' chips produced, no unfilled orders. DWL = $0.';
+            }
+        } else {
+            if (a === 0) {
+                note.innerHTML = '<strong>Normal supply, rigid pricing.</strong> Price pinned at $25 matches the equilibrium &mdash; no harm done.';
+            } else {
+                note.innerHTML = '<strong>Supply contracted, rigid pricing.</strong> Price stuck at $25 &mdash; only ' +
+                    qT.toFixed(1) + ' chips get made and ' + unfilled.toFixed(1) +
+                    ' orders go unfilled. DWL = $' + dwl.toFixed(1) + '.';
+            }
+        }
+    }
+
+    // ---------------------------- Wire up chart 6 ---------------------
+    const chipShiftSlider = document.getElementById('chip-shift');
+    const chipShiftNum = document.getElementById('chip-shift-num');
+    const chipFlexBtn = document.getElementById('chip-flex');
+    const chipRigidBtn = document.getElementById('chip-rigid');
+
+    function applyChipUI() {
+        chipFlexBtn.classList.toggle('active', chipFlex);
+        chipRigidBtn.classList.toggle('active', !chipFlex);
+        chipFlexBtn.setAttribute('aria-selected', chipFlex ? 'true' : 'false');
+        chipRigidBtn.setAttribute('aria-selected', chipFlex ? 'false' : 'true');
+    }
+
+    chipShiftSlider.addEventListener('input', () => {
+        chipShift = parseInt(chipShiftSlider.value, 10);
+        chipShiftNum.value = chipShift;
+        renderChart6();
+    });
+    chipShiftNum.addEventListener('input', () => {
+        let v = parseInt(chipShiftNum.value, 10);
+        if (isNaN(v)) return;
+        v = Math.max(0, Math.min(30, v));
+        chipShiftSlider.value = v;
+        chipShift = v;
+        renderChart6();
+    });
+    chipFlexBtn.addEventListener('click', () => {
+        chipFlex = true;
+        applyChipUI();
+        renderChart6();
+    });
+    chipRigidBtn.addEventListener('click', () => {
+        chipFlex = false;
+        applyChipUI();
+        renderChart6();
+    });
+
+    applyChipUI();
+    renderChart6();
 })();
 </script>
