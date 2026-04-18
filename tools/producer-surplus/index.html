@@ -459,11 +459,108 @@ side of the chart.
     </div>
 </div>
 
-<p style="margin-top: 2em; font-size: 1em;">
-Consumer and producer surplus are the same idea viewed from two sides
-of a transaction. Put them together and you have a complete map of
-where value in a market comes from, who captures it, and how much gets
-destroyed when a price is set in the wrong place.
+<!-- ============================================================ -->
+<!-- PART 6 -->
+<!-- ============================================================ -->
+<h2><span class="step">Part 6</span>Surge pricing up close</h2>
+<p>
+It's a Friday night. A concert lets out, it starts raining, the train
+line is down. Suddenly the number of people who want a ride has
+doubled, and they are willing to pay more to get home. In supply-demand
+language, the <strong>demand curve has shifted outward</strong> &mdash;
+at every price, the quantity demanded is higher. The supply curve
+hasn't moved: there's a fixed pool of drivers on the road right now.
+</p>
+<p>
+Drag the <strong>demand shift</strong> slider to move from a normal
+evening (0) to a full New Year's Eve spike (30). Then flip the
+<strong>surge</strong> toggle. With surge <em>off</em>, price is pinned
+at the normal-night equilibrium of $25 &mdash; effectively a price
+ceiling. With surge <em>on</em>, price floats up to whatever clears
+the new market, drawing more drivers onto the road and rationing rides
+to the people who value them most.
+</p>
+
+<div class="controls-panel">
+    <div class="control-group" style="margin-bottom: 14px;">
+        <span class="control-label" style="margin-bottom: 8px;">Surge pricing</span>
+        <div class="toggle-row" style="margin: 0;" role="tablist" aria-label="Surge pricing">
+            <button class="toggle-btn" id="uber-surge-off"
+                    role="tab" aria-selected="false">Off</button>
+            <button class="toggle-btn active" id="uber-surge-on"
+                    role="tab" aria-selected="true">On</button>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="uber-shift">Demand shift (normal &rarr; NYE)</label>
+        <div class="control-input-row">
+            <input type="range" id="uber-shift" class="control-slider"
+                   min="0" max="30" step="1" value="0"
+                   aria-label="Demand shift magnitude">
+            <input type="number" id="uber-shift-num" class="control-num"
+                   min="0" max="30" step="1" value="0">
+        </div>
+    </div>
+</div>
+
+<div class="chart-container">
+    <svg id="chart5" class="ps-svg" viewBox="0 0 600 360"
+         role="img" aria-labelledby="chart5-title chart5-desc">
+        <title id="chart5-title">Uber market with surge on or off</title>
+        <desc id="chart5-desc">Supply curve fixed while demand shifts outward; price either clears the market (surge on) or stays pinned (surge off), producing a shortage of rides.</desc>
+    </svg>
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-swatch" style="background:#9FE1CB;"></span>Rider surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#A8D8E4;"></span>Driver surplus</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#FCEBEB;"></span>Deadweight loss</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#FFE7C2;"></span>Unserved demand</div>
+        <div class="legend-item"><span class="legend-swatch dashed"></span>Price</div>
+    </div>
+    <div class="regime-note" id="uber-regime-note">
+        Normal night, surge on. Price clears the market at $25 with no shortage.
+    </div>
+</div>
+
+<div class="stat-grid" aria-live="polite">
+    <div class="stat-card price">
+        <div class="stat-label">Price</div>
+        <div class="stat-value" id="uber-stat-price">$25</div>
+    </div>
+    <div class="stat-card sellers">
+        <div class="stat-label">Rides completed</div>
+        <div class="stat-value" id="uber-stat-rides">5.0</div>
+    </div>
+    <div class="stat-card dwl">
+        <div class="stat-label">Riders unserved</div>
+        <div class="stat-value" id="uber-stat-unserved">0.0</div>
+    </div>
+    <div class="stat-card ps-surplus">
+        <div class="stat-label">Driver surplus</div>
+        <div class="stat-value" id="uber-stat-ps">$62.50</div>
+    </div>
+</div>
+
+<p style="margin-top: 1.4em;">
+Dial the demand shift all the way to 30 with surge off. Only five rides
+complete &mdash; the supply curve literally can't produce more at $25
+&mdash; while nearly ten riders are left at the curb. The red triangle
+is the deadweight loss, and it's made of trades that both sides
+<em>wanted</em> to happen but a capped price prevented.
+</p>
+<p>
+Flip surge on. Price jumps, but look at the chart: the deadweight-loss
+triangle vanishes. More drivers log on (the quantity traded grows along
+the supply curve), and the unserved-demand bar disappears. Total
+surplus is maximized &mdash; the exact same principle as Part 4, just
+with a demand curve that moves.
+</p>
+<p>
+The redistribution is real, though. A rider who was willing to pay $25
+on a normal night now pays the surge price instead, and that extra
+flows to the driver. Surge <em>grows</em> the pie <em>and</em> hands a
+larger share to the supply side. The policy debate around it is rarely
+about efficiency &mdash; it's almost always about whether that
+redistribution is acceptable in the rain.
 </p>
 
 </div><!-- /.ps -->
@@ -1276,5 +1373,318 @@ destroyed when a price is set in the wrong place.
     renderChart1();
     applyStrategyUI();
     renderAllInteractive();
+
+    // =================================================================
+    // Chart 5 — Surge pricing up close
+    //
+    // Same supply curve as Part 4, but demand shifts outward with the
+    // uberShift slider: P = (50 + d) - 5Q.  When surge is off we pin
+    // price at the normal-night equilibrium ($25) so the cap becomes a
+    // price ceiling once d > 0.  When surge is on, price floats to
+    // whatever clears the new market.
+    // =================================================================
+    const H5 = 360;
+    const X_MAX5 = 12;
+    const Y_MAX5 = 80;
+    const plotH5 = H5 - M.top - M.bottom;
+    function xScale5(q) { return M.left + (q / X_MAX5) * plotW; }
+    function yScale5(p) { return M.top + plotH5 - (p / Y_MAX5) * plotH5; }
+
+    const BASELINE_PRICE = 25;
+    let uberShift = 0;
+    let uberSurge = true;
+
+    function drawChart5Axes(svg) {
+        const yTicks = [0, 20, 40, 60, 80];
+        for (const t of yTicks) {
+            const y = yScale5(t);
+            svg.appendChild(el('line', {
+                x1: M.left, x2: W - M.right, y1: y, y2: y,
+                stroke: COLOR.grid, 'stroke-width': 1
+            }));
+            svg.appendChild(el('text', {
+                x: M.left - 8, y: y + 4,
+                'text-anchor': 'end',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, fill: COLOR.axisText
+            }, '$' + t));
+        }
+        svg.appendChild(el('line', {
+            x1: M.left, x2: M.left, y1: M.top, y2: M.top + plotH5,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: M.top + plotH5, y2: M.top + plotH5,
+            stroke: COLOR.axis, 'stroke-width': 1
+        }));
+        for (let q = 0; q <= X_MAX5; q += 2) {
+            const x = xScale5(q);
+            svg.appendChild(el('line', {
+                x1: x, x2: x, y1: M.top + plotH5, y2: M.top + plotH5 + 4,
+                stroke: COLOR.axis, 'stroke-width': 1
+            }));
+            svg.appendChild(el('text', {
+                x: x, y: M.top + plotH5 + 16,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, fill: COLOR.axisText
+            }, q));
+        }
+        svg.appendChild(el('text', {
+            x: 12, y: M.top + plotH5 / 2,
+            'text-anchor': 'middle',
+            transform: `rotate(-90, 12, ${M.top + plotH5 / 2})`,
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, fill: COLOR.axisText
+        }, 'price per ride ($)'));
+        svg.appendChild(el('text', {
+            x: M.left + plotW / 2, y: M.top + plotH5 + 44,
+            'text-anchor': 'middle',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, fill: COLOR.axisText
+        }, 'rides per hour'));
+    }
+
+    function fmtPrice(p) {
+        return (p % 1 === 0) ? '$' + p : '$' + p.toFixed(1);
+    }
+
+    function renderChart5() {
+        const svg = document.getElementById('chart5');
+        clear(svg);
+        drawChart5Axes(svg);
+
+        const d = uberShift;
+        const yInt = 50 + d;
+        // Surge equilibrium (always the market-clearing point for shifted demand)
+        const qEq = yInt / 10;
+        const pEq = yInt / 2;
+
+        const price = uberSurge ? pEq : BASELINE_PRICE;
+        const qS = Math.max(0, Math.min(X_MAX5, price / 5));
+        const qD = Math.max(0, Math.min(X_MAX5, (yInt - price) / 5));
+        const qT = Math.min(qS, qD);
+        const unserved = Math.max(0, qD - qS);
+
+        // Surplus areas (using efficient rationing: top-WTP buyers served first)
+        const cs = (yInt - price) * qT - (5 * qT * qT) / 2;
+        const ps = price * qT - (5 * qT * qT) / 2;
+        const totalMax = yInt * qEq / 2; // ½ × qEq × yInt = max achievable total surplus
+        const dwl = Math.max(0, totalMax - cs - ps);
+
+        // ---------- Rider surplus (CS) ----------
+        if (qT > 0 && price < yInt) {
+            const pts = (qT >= qD - 1e-9)
+                ? [
+                    [xScale5(0), yScale5(price)],
+                    [xScale5(0), yScale5(yInt)],
+                    [xScale5(qT), yScale5(price)]
+                ]
+                : [
+                    [xScale5(0), yScale5(price)],
+                    [xScale5(0), yScale5(yInt)],
+                    [xScale5(qT), yScale5(yInt - 5 * qT)],
+                    [xScale5(qT), yScale5(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.cs, opacity: 0.9
+            }));
+        }
+
+        // ---------- Driver surplus (PS) ----------
+        if (qT > 0 && price > 0) {
+            const pts = (qT >= qS - 1e-9)
+                ? [
+                    [xScale5(0), yScale5(0)],
+                    [xScale5(qT), yScale5(price)],
+                    [xScale5(0), yScale5(price)]
+                ]
+                : [
+                    [xScale5(0), yScale5(0)],
+                    [xScale5(qT), yScale5(5 * qT)],
+                    [xScale5(qT), yScale5(price)],
+                    [xScale5(0), yScale5(price)]
+                ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.ps, opacity: 0.9
+            }));
+        }
+
+        // ---------- Deadweight loss ----------
+        if (qT < qEq - 1e-9) {
+            const pts = [
+                [xScale5(qT), yScale5(5 * qT)],
+                [xScale5(qT), yScale5(yInt - 5 * qT)],
+                [xScale5(qEq), yScale5(pEq)]
+            ];
+            svg.appendChild(el('polygon', {
+                points: pts.map(p => p.join(',')).join(' '),
+                fill: COLOR.dwl, opacity: 0.95
+            }));
+        }
+
+        // ---------- Unserved-demand band on x-axis ----------
+        if (unserved > 0.01) {
+            const y0 = yScale5(0);
+            svg.appendChild(el('rect', {
+                x: xScale5(qS), y: y0 + 3,
+                width: xScale5(qD) - xScale5(qS), height: 5,
+                fill: '#FFE7C2', stroke: '#E2A65A', 'stroke-width': 0.8
+            }));
+            svg.appendChild(el('text', {
+                x: (xScale5(qS) + xScale5(qD)) / 2, y: y0 + 22,
+                'text-anchor': 'middle',
+                'font-family': 'Helvetica, Arial, sans-serif',
+                'font-size': 10, 'font-style': 'italic',
+                fill: '#8a6b3a'
+            }, 'unserved ' + unserved.toFixed(1)));
+        }
+
+        // ---------- Curves ----------
+        // Baseline demand (dashed, only if demand has shifted)
+        if (d > 0) {
+            svg.appendChild(el('line', {
+                x1: xScale5(0), y1: yScale5(50),
+                x2: xScale5(10), y2: yScale5(0),
+                stroke: COLOR.demand, 'stroke-width': 1.2,
+                'stroke-dasharray': '4 3', opacity: 0.4
+            }));
+            svg.appendChild(el('text', {
+                x: xScale5(10) - 4, y: yScale5(0) - 6,
+                'text-anchor': 'end',
+                'font-family': 'Georgia, serif', 'font-size': 9.5,
+                'font-style': 'italic', fill: COLOR.demand, opacity: 0.7
+            }, 'normal-night demand'));
+        }
+        // Shifted demand (solid)
+        const qDemandMax = Math.min(X_MAX5, yInt / 5);
+        const yDemandStart = Math.min(yInt, Y_MAX5);
+        const qDemandStart = yInt > Y_MAX5 ? (yInt - Y_MAX5) / 5 : 0;
+        svg.appendChild(el('line', {
+            x1: xScale5(qDemandStart), y1: yScale5(yDemandStart),
+            x2: xScale5(qDemandMax), y2: yScale5(yInt - 5 * qDemandMax),
+            stroke: COLOR.demand, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('text', {
+            x: xScale5(qDemandStart) + 6, y: yScale5(yDemandStart) + 14,
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.demand
+        }, d > 0 ? 'Demand (spiked)' : 'Demand'));
+        // Supply
+        svg.appendChild(el('line', {
+            x1: xScale5(0), y1: yScale5(0),
+            x2: xScale5(X_MAX5), y2: yScale5(5 * X_MAX5),
+            stroke: COLOR.supply, 'stroke-width': 2.5
+        }));
+        svg.appendChild(el('text', {
+            x: xScale5(X_MAX5) - 6, y: yScale5(5 * X_MAX5) - 8,
+            'text-anchor': 'end',
+            'font-family': 'Georgia, serif', 'font-size': 11,
+            'font-weight': 700, fill: COLOR.supply
+        }, 'Supply'));
+
+        // Equilibrium dot (where supply meets shifted demand)
+        if (qEq <= X_MAX5 && pEq <= Y_MAX5) {
+            svg.appendChild(el('circle', {
+                cx: xScale5(qEq), cy: yScale5(pEq), r: 5,
+                fill: '#fff', stroke: '#2c3e50', 'stroke-width': 2
+            }));
+            svg.appendChild(el('text', {
+                x: xScale5(qEq) + 8, y: yScale5(pEq) - 8,
+                'font-family': 'Georgia, serif', 'font-size': 10.5,
+                'font-weight': 700, fill: '#2c3e50'
+            }, uberSurge ? 'Market clears' : 'Would-be equilibrium'));
+        }
+
+        // Price line
+        const py = yScale5(price);
+        svg.appendChild(el('line', {
+            x1: M.left, x2: W - M.right, y1: py, y2: py,
+            stroke: COLOR.price, 'stroke-width': 2,
+            'stroke-dasharray': '6 4'
+        }));
+        svg.appendChild(el('text', {
+            x: W - M.right - 2, y: py - 5,
+            'text-anchor': 'end',
+            'font-family': 'Helvetica, Arial, sans-serif',
+            'font-size': 11, 'font-weight': 700, fill: COLOR.price
+        }, 'Price ' + fmtPrice(price)));
+
+        // Drop line at quantity traded
+        if (qT > 0 && qT < X_MAX5) {
+            svg.appendChild(el('line', {
+                x1: xScale5(qT), x2: xScale5(qT),
+                y1: py, y2: yScale5(0),
+                stroke: COLOR.axis, 'stroke-width': 1,
+                'stroke-dasharray': '3 3'
+            }));
+        }
+
+        // ---------- Stats & regime note ----------
+        document.getElementById('uber-stat-price').textContent = fmtPrice(price);
+        document.getElementById('uber-stat-rides').textContent = qT.toFixed(1);
+        document.getElementById('uber-stat-unserved').textContent = unserved.toFixed(1);
+        document.getElementById('uber-stat-ps').textContent = '$' + ps.toFixed(2);
+
+        const note = document.getElementById('uber-regime-note');
+        if (uberSurge) {
+            if (d === 0) {
+                note.innerHTML = '<strong>Normal night, surge on.</strong> Price clears the market at $25 with no shortage.';
+            } else {
+                note.innerHTML = '<strong>Demand spike, surge on.</strong> Price rises to ' + fmtPrice(price) +
+                    ', ' + qT.toFixed(1) + ' rides happen, no one stranded. DWL = $0.';
+            }
+        } else {
+            if (d === 0) {
+                note.innerHTML = '<strong>Normal night.</strong> Price sits at $25, market clears on its own.';
+            } else {
+                note.innerHTML = '<strong>Demand spike, surge off.</strong> Price pinned at $25 &mdash; only ' +
+                    qT.toFixed(1) + ' rides happen and ' + unserved.toFixed(1) +
+                    ' riders are left at the curb. DWL = $' + dwl.toFixed(1) + '.';
+            }
+        }
+    }
+
+    // ---------------------------- Wire up chart 5 ---------------------
+    const uberShiftSlider = document.getElementById('uber-shift');
+    const uberShiftNum = document.getElementById('uber-shift-num');
+    const uberOn = document.getElementById('uber-surge-on');
+    const uberOff = document.getElementById('uber-surge-off');
+
+    function applyUberUI() {
+        uberOn.classList.toggle('active', uberSurge);
+        uberOff.classList.toggle('active', !uberSurge);
+        uberOn.setAttribute('aria-selected', uberSurge ? 'true' : 'false');
+        uberOff.setAttribute('aria-selected', uberSurge ? 'false' : 'true');
+    }
+
+    uberShiftSlider.addEventListener('input', () => {
+        uberShift = parseInt(uberShiftSlider.value, 10);
+        uberShiftNum.value = uberShift;
+        renderChart5();
+    });
+    uberShiftNum.addEventListener('input', () => {
+        let v = parseInt(uberShiftNum.value, 10);
+        if (isNaN(v)) return;
+        v = Math.max(0, Math.min(30, v));
+        uberShiftSlider.value = v;
+        uberShift = v;
+        renderChart5();
+    });
+    uberOn.addEventListener('click', () => {
+        uberSurge = true;
+        applyUberUI();
+        renderChart5();
+    });
+    uberOff.addEventListener('click', () => {
+        uberSurge = false;
+        applyUberUI();
+        renderChart5();
+    });
+
+    applyUberUI();
+    renderChart5();
 })();
 </script>
